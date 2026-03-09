@@ -1,0 +1,24 @@
+name: Deploy Website to Azure Storage
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Log in to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }} # Opcional se usar apenas storage, mas vamos simplificar usando a conexão direta abaixo
+
+    - name: Upload to Azure Storage
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+          az storage blob upload-batch --account-name perfilabstorage --auth-mode key --account-key "${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" -d '$web' -s . --overwrite
