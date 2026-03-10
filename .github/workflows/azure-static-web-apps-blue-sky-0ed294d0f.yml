@@ -14,7 +14,6 @@ jobs:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
     name: Build and Deploy Job
-
     permissions:
       id-token: write
       contents: read
@@ -45,8 +44,8 @@ jobs:
           action: "upload"
           app_location: "/"
           api_location: ""
-          app_build_command: "npm run build"
-          output_location: "dist"
+          output_location: ""
+          skip_app_build: true
           github_id_token: ${{ steps.idtoken.outputs.result }}
 
   close_pull_request_job:
