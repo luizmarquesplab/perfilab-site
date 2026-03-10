@@ -22,7 +22,7 @@
       padding: 32px;
       border-radius: 16px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-      max-width: 520px;
+      max-width: 560px;
       width: 100%;
       box-sizing: border-box;
     }
@@ -52,6 +52,11 @@
       font-size: 16px;
       font-weight: bold;
       cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
     }
 
     .option {
@@ -90,13 +95,37 @@
       padding: 10px;
       font-size: 14px;
     }
+
+    .loading-wrap {
+      text-align: center;
+    }
+
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #0078d4;
+      border-radius: 50%;
+      width: 42px;
+      height: 42px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+
+    .small-muted {
+      color: #666;
+      font-size: 14px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
   <div id="quiz-card">
     <div id="step-lead">
       <h2>Inicie seu Diagnóstico</h2>
-      <p>Preencha para iniciar.</p>
+      <p>Preencha para calcular seu risco de substituição pela IA.</p>
 
       <input type="text" id="name" placeholder="Seu nome completo" />
       <input type="email" id="email" placeholder="Seu melhor e-mail" />
@@ -108,12 +137,24 @@
 
     <div id="step-quiz" class="hidden">
       <div class="progress"><div id="bar"></div></div>
-      <h3 id="q-text"></h3>
+      <h3 id="q-text" style="min-height: 60px;"></h3>
       <div id="options"></div>
+    </div>
+
+    <div id="step-loading" class="hidden">
+      <div class="loading-wrap">
+        <div class="spinner"></div>
+        <h3>Analisando suas respostas...</h3>
+        <p class="small-muted">Gravando seus dados e preparando seu score.</p>
+        <div id="sendError" class="error-box hidden"></div>
+      </div>
     </div>
   </div>
 
   <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw_btw9zJdEQ_q44A6CSOzh7FLVRkMiGDNjjTvjqJfuSlMVy64_mNLUpxI8hvhpG886/exec";
+    const SCORE_MAXIMO = 80;
+
     let scoreTotal = 0;
     let current = 0;
 
@@ -131,6 +172,27 @@
           { t: "Ainda não ou muito pouco.", p: 15 },
           { t: "Sim, sou usuário frequente.", p: 0 }
         ]
+      },
+      {
+        q: "3. Qual sua principal área de atuação?",
+        opt: [
+          { t: "Administrativa, Dados ou Técnica", p: 15 },
+          { t: "Saúde, Educação ou Criativa", p: 5 }
+        ]
+      },
+      {
+        q: "4. Seu trabalho exige negociações ou empatia humana complexa?",
+        opt: [
+          { t: "Raramente.", p: 15 },
+          { t: "O tempo todo.", p: 0 }
+        ]
+      },
+      {
+        q: "5. Sua empresa está planejando automações em 2026?",
+        opt: [
+          { t: "Sim, já ouvi falar.", p: 15 },
+          { t: "Não ou não sei.", p: 5 }
+        ]
       }
     ];
 
@@ -146,12 +208,28 @@
       box.classList.add("hidden");
     }
 
+    function showSendError(message) {
+      const box = document.getElementById("sendError");
+      box.textContent = message;
+      box.classList.remove("hidden");
+    }
+
+    function hideSendError() {
+      const box = document.getElementById("sendError");
+      box.textContent = "";
+      box.classList.add("hidden");
+    }
+
     function validarEmail(email) {
       return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     }
 
     function limparTelefone(telefone) {
       return telefone.replace(/\D/g, "");
+    }
+
+    function calcularScorePercentual(scoreBruto) {
+      return Math.round((scoreBruto / SCORE_MAXIMO) * 100);
     }
 
     function showQuestion() {
@@ -174,7 +252,7 @@
           if (current < questions.length) {
             showQuestion();
           } else {
-            alert("Teste OK. O botão funcionou e o quiz avançou.");
+            finalizeQuiz();
           }
         });
 
@@ -188,7 +266,7 @@
       hideLeadError();
 
       const name = document.getElementById("name").value.trim();
-      const email = document.getElementById("email").value.trim();
+      const email = document.getElementById("email").value.trim().toLowerCase();
       const phone = limparTelefone(document.getElementById("phone").value.trim());
 
       if (!name || !email || !phone) {
@@ -206,10 +284,70 @@
         return;
       }
 
+      window.perfilabLead = {
+        nome: name,
+        email: email,
+        whatsapp: phone
+      };
+
       document.getElementById("step-lead").classList.add("hidden");
       document.getElementById("step-quiz").classList.remove("hidden");
 
       showQuestion();
+    }
+
+    async function finalizeQuiz() {
+      document.getElementById("step-quiz").classList.add("hidden");
+      document.getElementById("step-loading").classList.remove("hidden");
+      hideSendError();
+
+      const payload = {
+        action: "lead_capture",
+        nome: window.perfilabLead.nome,
+        email: window.perfilabLead.email,
+        whatsapp: window.perfilabLead.whatsapp,
+        score_bruto: scoreTotal,
+        score_percentual: calcularScorePercentual(scoreTotal),
+        timestamp: Date.now(),
+        origem: "diagnostico_html"
+      };
+
+      localStorage.setItem("perfilab_user", JSON.stringify(payload));
+
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const text = await response.text();
+
+        let result;
+        try {
+          result = JSON.parse(text);
+        } catch (e) {
+          throw new Error("Resposta inválida do Apps Script: " + text);
+        }
+
+        if (!result.ok) {
+          throw new Error(result.message || "Falha ao gravar lead.");
+        }
+
+        if (result.payment_link) {
+          const stored = JSON.parse(localStorage.getItem("perfilab_user") || "{}");
+          stored.payment_link = result.payment_link;
+          stored.product_type = result.product_type || "";
+          localStorage.setItem("perfilab_user", JSON.stringify(stored));
+        }
+
+        window.location.href = "resultado.html";
+      } catch (error) {
+        console.error("Erro ao enviar lead:", error);
+        showSendError("Não foi possível registrar os dados. Verifique a URL do Apps Script, a implantação do Web App e tente novamente.");
+      }
     }
 
     document.addEventListener("DOMContentLoaded", function() {
