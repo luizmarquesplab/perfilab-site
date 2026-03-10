@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Diagnóstico | Perfil Lab</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
@@ -13,6 +14,7 @@
         .option:hover { border-color: #0078d4; background: #f0f7ff; }
         .progress { background: #eee; height: 8px; border-radius: 4px; margin-bottom: 20px; overflow: hidden; }
         #bar { background: #0078d4; height: 100%; width: 0%; transition: 0.3s; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -39,14 +41,13 @@
     </div>
 </div>
 
-<style> @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } } </style>
-
 <script>
-    // URL SUBSTITUÍDA CONFORME SOLICITADO
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby98-IM0ewJzHhPXfmQ65dcTe0oQsj0kYBB0lUqC3OnZLIX_amRkoXDhTTs_MM2Tvpu/exec";
+    // URL ATUALIZADA DA SUA NOVA IMPLANTAÇÃO
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwHBcfymDCfn4FjldOZwX248JEd-P7_YCQsc5Y4DOdXd-VxzRSdYTjxHdH9lrIAJMn_/exec";
     
-    let userData = { name:'', email:'', phone:'', score:0, authorized:true, timestamp:0 };
+    let scoreTotal = 0;
     let current = 0;
+    let userLead = { nome: '', email: '', whatsapp: '' };
 
     const questions = [
         { q: "1. Sua rotina envolve muitas tarefas repetitivas?", opt: [{t:"Sim, a maior parte do tempo.", p:20}, {t:"Não, meu trabalho é imprevisível.", p:5}] },
@@ -57,11 +58,11 @@
     ];
 
     function start() {
-        userData.name = document.getElementById('name').value;
-        userData.email = document.getElementById('email').value;
-        userData.phone = document.getElementById('phone').value;
+        userLead.nome = document.getElementById('name').value;
+        userLead.email = document.getElementById('email').value;
+        userLead.whatsapp = document.getElementById('phone').value;
         
-        if(!userData.name || !userData.email || !userData.phone) {
+        if(!userLead.nome || !userLead.email || !userLead.whatsapp) {
             return alert("Por favor, preencha todos os campos.");
         }
         
@@ -81,7 +82,7 @@
             b.className = 'option'; 
             b.innerText = o.t;
             b.onclick = () => { 
-                userData.score += o.p; 
+                scoreTotal += o.p; 
                 current++; 
                 if(current < questions.length) show(); else send(); 
             };
@@ -94,19 +95,31 @@
         document.getElementById('step-quiz').classList.add('hidden');
         document.getElementById('step-loading').classList.remove('hidden');
         
-        userData.timestamp = new Date().getTime();
-        localStorage.setItem('perfilab_user', JSON.stringify(userData));
+        // Objeto final formatado para o Google Script
+        const payload = {
+            nome: userLead.nome,
+            email: userLead.email,
+            whatsapp: userLead.whatsapp,
+            score: scoreTotal
+        };
 
-        // Envia para sua planilha via POST
+        // Salva no navegador para a página de resultado usar
+        localStorage.setItem('perfilab_user', JSON.stringify(payload));
+
+        // ENVIO PARA A PLANILHA
         fetch(SCRIPT_URL, { 
             method: 'POST', 
             mode: 'no-cors', 
+            cache: 'no-cache',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(userData) 
-        }).then(() => {
-            window.location.href = "resultado.html";
-        }).catch(() => {
-            // Em caso de erro, segue para o resultado para não perder a venda
+            body: JSON.stringify(payload) 
+        })
+        .then(() => {
+            // Pequeno delay para o usuário ver o "Analisando"
+            setTimeout(() => { window.location.href = "resultado.html"; }, 1500);
+        })
+        .catch((error) => {
+            console.error("Erro no envio:", error);
             window.location.href = "resultado.html";
         });
     }
