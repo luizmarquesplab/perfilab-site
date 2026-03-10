@@ -1,339 +1,222 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Diagnóstico | Perfil Lab</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: #f4f7f6;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Diagnóstico | Perfil Lab</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f7f6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      box-sizing: border-box;
+    }
 
-        #quiz-card {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            max-width: 560px;
-            width: 100%;
-            box-sizing: border-box;
-        }
+    #quiz-card {
+      background: white;
+      padding: 32px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      max-width: 520px;
+      width: 100%;
+      box-sizing: border-box;
+    }
 
-        .hidden {
-            display: none;
-        }
+    .hidden {
+      display: none;
+    }
 
-        input {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-sizing: border-box;
-            font-size: 1rem;
-        }
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-sizing: border-box;
+      font-size: 16px;
+    }
 
-        .btn-next {
-            background: #0078d4;
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 8px;
-            width: 100%;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 1rem;
-            margin-top: 10px;
-        }
+    button {
+      width: 100%;
+      padding: 14px;
+      margin-top: 10px;
+      background: #0078d4;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
 
-        .btn-next:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
+    .option {
+      background: white;
+      color: #222;
+      border: 2px solid #eaeaea;
+      text-align: left;
+    }
 
-        .option {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            margin: 10px 0;
-            border: 2px solid #eee;
-            border-radius: 8px;
-            background: none;
-            text-align: left;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: 0.2s;
-        }
+    .option:hover {
+      border-color: #0078d4;
+      background: #f3f8ff;
+    }
 
-        .option:hover {
-            border-color: #0078d4;
-            background: #f0f7ff;
-        }
+    .progress {
+      background: #eee;
+      height: 8px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
 
-        .progress {
-            background: #eee;
-            height: 8px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            overflow: hidden;
-        }
+    #bar {
+      background: #0078d4;
+      height: 100%;
+      width: 0%;
+      transition: 0.3s;
+    }
 
-        #bar {
-            background: #0078d4;
-            height: 100%;
-            width: 0%;
-            transition: 0.3s;
-        }
-
-        .helper {
-            color: #666;
-            font-size: 0.92rem;
-            margin-top: 0;
-            margin-bottom: 18px;
-        }
-
-        .error-box {
-            margin-top: 14px;
-            background: #fff3f3;
-            color: #b42318;
-            border: 1px solid #f5c2c7;
-            border-radius: 10px;
-            padding: 12px;
-            font-size: 0.92rem;
-        }
-
-        .loading-wrap {
-            text-align: center;
-        }
-
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #0078d4;
-            border-radius: 50%;
-            width: 42px;
-            height: 42px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .small-muted {
-            color: #777;
-            font-size: 0.9rem;
-        }
-    </style>
+    .error-box {
+      margin-top: 12px;
+      background: #fff4f4;
+      color: #b42318;
+      border: 1px solid #f1c0c0;
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 14px;
+    }
+  </style>
 </head>
 <body>
-<div id="quiz-card">
+  <div id="quiz-card">
     <div id="step-lead">
-        <h2 style="margin-top:0;">Inicie seu Diagnóstico</h2>
-        <p class="helper">Preencha seus dados para calcular seu risco de substituição pela IA.</p>
+      <h2>Inicie seu Diagnóstico</h2>
+      <p>Preencha para iniciar.</p>
 
-        <input type="text" id="name" placeholder="Seu nome completo" />
-        <input type="email" id="email" placeholder="Seu melhor e-mail" />
-        <input type="tel" id="phone" placeholder="WhatsApp com DDD" />
+      <input type="text" id="name" placeholder="Seu nome completo" />
+      <input type="email" id="email" placeholder="Seu melhor e-mail" />
+      <input type="tel" id="phone" placeholder="WhatsApp com DDD" />
 
-        <button id="startBtn" class="btn-next" onclick="startQuiz()">Começar Diagnóstico →</button>
-        <div id="leadError" class="error-box hidden"></div>
+      <button id="startBtn" type="button">Começar Diagnóstico →</button>
+      <div id="leadError" class="error-box hidden"></div>
     </div>
 
     <div id="step-quiz" class="hidden">
-        <div class="progress"><div id="bar"></div></div>
-        <h3 id="q-text" style="min-height: 60px;"></h3>
-        <div id="options"></div>
+      <div class="progress"><div id="bar"></div></div>
+      <h3 id="q-text"></h3>
+      <div id="options"></div>
     </div>
+  </div>
 
-    <div id="step-loading" class="hidden">
-        <div class="loading-wrap">
-            <div class="spinner"></div>
-            <h3>Analisando suas respostas...</h3>
-            <p class="small-muted">Gravando seus dados e preparando seu score personalizado para 2026.</p>
-            <div id="sendError" class="error-box hidden"></div>
-        </div>
-    </div>
-</div>
-
-<script>
-    const SCRIPT_URL = https://script.google.com/macros/s/AKfycbxzY3DxI0BvjPIS3quP4WLl2q9yn9uxKijb9FcA1TAMqrqo7MqsspXnELahc4xxYHDO/exec;
-
+  <script>
     let scoreTotal = 0;
     let current = 0;
 
-    const userLead = {
-        nome: "",
-        email: "",
-        whatsapp: "",
-        scoreBruto: 0,
-        scorePercentual: 0,
-        timestamp: 0
-    };
-
     const questions = [
-        { q: "1. Sua rotina envolve muitas tarefas repetitivas?", opt: [{ t: "Sim, a maior parte do tempo.", p: 20 }, { t: "Não, meu trabalho é imprevisível.", p: 5 }] },
-        { q: "2. Você já utiliza ferramentas de IA no dia a dia?", opt: [{ t: "Ainda não ou muito pouco.", p: 15 }, { t: "Sim, sou usuário frequente.", p: 0 }] },
-        { q: "3. Qual sua principal área de atuação?", opt: [{ t: "Administrativa, Dados ou Técnica", p: 15 }, { t: "Saúde, Educação ou Criativa", p: 5 }] },
-        { q: "4. Seu trabalho exige negociações ou empatia humana complexa?", opt: [{ t: "Raramente.", p: 15 }, { t: "O tempo todo.", p: 0 }] },
-        { q: "5. Sua empresa está planejando automações em 2026?", opt: [{ t: "Sim, já ouvi falar.", p: 15 }, { t: "Não ou não sei.", p: 5 }] }
+      {
+        q: "1. Sua rotina envolve muitas tarefas repetitivas?",
+        opt: [
+          { t: "Sim, a maior parte do tempo.", p: 20 },
+          { t: "Não, meu trabalho é imprevisível.", p: 5 }
+        ]
+      },
+      {
+        q: "2. Você já utiliza ferramentas de IA no dia a dia?",
+        opt: [
+          { t: "Ainda não ou muito pouco.", p: 15 },
+          { t: "Sim, sou usuário frequente.", p: 0 }
+        ]
+      }
     ];
 
-    const SCORE_MAXIMO = 80;
-
     function showLeadError(message) {
-        const box = document.getElementById("leadError");
-        box.textContent = message;
-        box.classList.remove("hidden");
+      const box = document.getElementById("leadError");
+      box.textContent = message;
+      box.classList.remove("hidden");
     }
 
     function hideLeadError() {
-        const box = document.getElementById("leadError");
-        box.textContent = "";
-        box.classList.add("hidden");
-    }
-
-    function showSendError(message) {
-        const box = document.getElementById("sendError");
-        box.textContent = message;
-        box.classList.remove("hidden");
-    }
-
-    function hideSendError() {
-        const box = document.getElementById("sendError");
-        box.textContent = "";
-        box.classList.add("hidden");
+      const box = document.getElementById("leadError");
+      box.textContent = "";
+      box.classList.add("hidden");
     }
 
     function validarEmail(email) {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     }
 
     function limparTelefone(telefone) {
-        return telefone.replace(/\D/g, "");
-    }
-
-    function calcularScorePercentual(scoreBruto) {
-        return Math.round((scoreBruto / SCORE_MAXIMO) * 100);
-    }
-
-    function startQuiz() {
-        hideLeadError();
-
-        const name = document.getElementById("name").value.trim();
-        const email = document.getElementById("email").value.trim().toLowerCase();
-        const phone = limparTelefone(document.getElementById("phone").value.trim());
-
-        if (!name || !email || !phone) {
-            showLeadError("Preencha nome, e-mail e WhatsApp para continuar.");
-            return;
-        }
-
-        if (!validarEmail(email)) {
-            showLeadError("Digite um e-mail válido.");
-            return;
-        }
-
-        if (phone.length < 10) {
-            showLeadError("Digite um WhatsApp válido com DDD.");
-            return;
-        }
-
-        userLead.nome = name;
-        userLead.email = email;
-        userLead.whatsapp = phone;
-
-        document.getElementById("step-lead").classList.add("hidden");
-        document.getElementById("step-quiz").classList.remove("hidden");
-
-        showQuestion();
+      return telefone.replace(/\D/g, "");
     }
 
     function showQuestion() {
-        const q = questions[current];
-        document.getElementById("q-text").innerText = q.q;
+      const q = questions[current];
+      document.getElementById("q-text").innerText = q.q;
 
-        const div = document.getElementById("options");
-        div.innerHTML = "";
+      const optionsDiv = document.getElementById("options");
+      optionsDiv.innerHTML = "";
 
-        q.opt.forEach(option => {
-            const button = document.createElement("button");
-            button.className = "option";
-            button.innerText = option.t;
-            button.onclick = () => {
-                scoreTotal += option.p;
-                current++;
+      q.opt.forEach(function(option) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "option";
+        button.textContent = option.t;
 
-                if (current < questions.length) {
-                    showQuestion();
-                } else {
-                    finalizeQuiz();
-                }
-            };
-            div.appendChild(button);
+        button.addEventListener("click", function() {
+          scoreTotal += option.p;
+          current++;
+
+          if (current < questions.length) {
+            showQuestion();
+          } else {
+            alert("Teste OK. O botão funcionou e o quiz avançou.");
+          }
         });
 
-        document.getElementById("bar").style.width = ((current / questions.length) * 100) + "%";
+        optionsDiv.appendChild(button);
+      });
+
+      document.getElementById("bar").style.width = ((current / questions.length) * 100) + "%";
     }
 
-    async function finalizeQuiz() {
-        document.getElementById("step-quiz").classList.add("hidden");
-        document.getElementById("step-loading").classList.remove("hidden");
-        hideSendError();
+    function startQuiz() {
+      hideLeadError();
 
-        userLead.scoreBruto = scoreTotal;
-        userLead.scorePercentual = calcularScorePercentual(scoreTotal);
-        userLead.timestamp = Date.now();
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const phone = limparTelefone(document.getElementById("phone").value.trim());
 
-        const payload = {
-            nome: userLead.nome,
-            email: userLead.email,
-            whatsapp: userLead.whatsapp,
-            score_bruto: userLead.scoreBruto,
-            score_percentual: userLead.scorePercentual,
-            timestamp: userLead.timestamp,
-            origem: "diagnostico_html"
-        };
+      if (!name || !email || !phone) {
+        showLeadError("Preencha nome, e-mail e WhatsApp.");
+        return;
+      }
 
-        localStorage.setItem("perfilab_user", JSON.stringify(payload));
+      if (!validarEmail(email)) {
+        showLeadError("Digite um e-mail válido.");
+        return;
+      }
 
-        try {
-            const response = await fetch(SCRIPT_URL, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "text/plain;charset=utf-8"
-                },
-                body: JSON.stringify(payload)
-            });
+      if (phone.length < 10) {
+        showLeadError("Digite um WhatsApp válido com DDD.");
+        return;
+      }
 
-            const text = await response.text();
+      document.getElementById("step-lead").classList.add("hidden");
+      document.getElementById("step-quiz").classList.remove("hidden");
 
-            let data;
-            try {
-                data = JSON.parse(text);
-            } catch (parseError) {
-                throw new Error("Resposta inválida do Apps Script: " + text);
-            }
-
-            if (!data.ok) {
-                throw new Error(data.message || "Falha ao gravar lead.");
-            }
-
-            window.location.href = "resultado.html";
-        } catch (error) {
-            console.error("Erro ao gravar lead:", error);
-            showSendError("Não foi possível registrar seus dados agora. Verifique a implantação do Apps Script e tente novamente.");
-        }
+      showQuestion();
     }
-</script>
+
+    document.addEventListener("DOMContentLoaded", function() {
+      const startBtn = document.getElementById("startBtn");
+      startBtn.addEventListener("click", startQuiz);
+      console.log("Diagnóstico carregado com sucesso.");
+    });
+  </script>
 </body>
 </html>
