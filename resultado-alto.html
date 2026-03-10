@@ -3,24 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resultado | Perfil Lab</title>
+    <title>Resultado Crítico | Perfil Lab</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #fff1f0; text-align: center; padding: 50px 20px; }
-        .card { max-width: 600px; margin: auto; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        .alert { color: #ff4d4f; font-weight: bold; border: 2px solid #ff4d4f; padding: 10px; display: inline-block; margin-bottom: 20px; }
-        .btn-pay { display: inline-block; background: #25d366; color: white; padding: 20px 40px; border-radius: 10px; text-decoration: none; font-weight: bold; font-size: 1.4rem; margin-top: 30px; border: none; cursor: pointer; }
+        :root { --danger: #e74c3c; --text: #2c3e50; }
+        body { font-family: 'Segoe UI', sans-serif; background: #fff5f5; color: var(--text); padding: 40px 20px; text-align: center; }
+        .report-card { max-width: 700px; margin: auto; background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-top: 10px solid var(--danger); }
+        .user-name { color: var(--danger); font-weight: bold; }
+        .score-box { background: #fee2e2; padding: 20px; border-radius: 10px; margin: 20px 0; border: 1px solid #fca5a5; }
+        .report-preview { text-align: left; background: #f9fafb; padding: 20px; border-left: 4px solid var(--danger); margin: 20px 0; font-style: italic; }
+        .btn-pay { display: inline-block; background: #c0392b; color: white; padding: 20px 40px; border-radius: 10px; text-decoration: none; font-weight: bold; font-size: 1.2rem; transition: 0.3s; }
+        .btn-pay:hover { background: #a93226; transform: translateY(-3px); }
     </style>
 </head>
 <body>
-    <div class="card">
-        <div class="alert">RISCO DE SUBSTITUIÇÃO: ALTO</div>
-        <h1>Sua carreira está em perigo imediato.</h1>
-        <p>A análise indica que sua função atual possui <strong>alto índice de automação</strong> para os próximos meses.</p>
-        <p>Para não ser deixado para trás, você precisa do nosso <strong>Plano de Blindagem de Carreira 2026</strong>.</p>
+    <div class="report-card">
+        <h1>Diagnóstico Crítico: <span id="name-display" class="user-name">...</span></h1>
         
-        <a href="https://pay.hotmart.com/SEU_LINK" class="btn-pay">QUERO MEU PLANO DE AÇÃO AGORA</a>
+        <div class="score-box">
+            <h2 style="margin:0">Índice de Substituibilidade: <span id="score-display">0</span>%</h2>
+            <p>Sua função apresenta características de alta automação para 2026.</p>
+        </div>
+
+        <h3>Resumo do seu Relatório Personalizado:</h3>
+        <div class="report-preview">
+            "Com base nas suas respostas sobre rotina repetitiva e baixa adoção de ferramentas de IA, o sistema Perfil Lab identificou que <strong>74% das suas entregas atuais</strong> podem ser replicadas por agentes autônomos de IA em menos de 12 meses..."
+        </div>
+
+        <p><strong>A boa notícia:</strong> Você ainda pode migrar para a camada estratégica da sua profissão.</p>
         
-        <p style="margin-top:20px; font-size: 0.9rem; color: #666;">Acesso imediato após o pagamento.</p>
+        <a href="LINK_STRIPE_OU_MERCADOPAGO_ALTO" class="btn-pay">OBTER MEU PLANO DE TRANSIÇÃO IA →</a>
+        <p style="font-size: 0.8rem; color: #7f8c8d; margin-top: 15px;">Acesso imediato ao PDF e à mentoria gravada.</p>
     </div>
+
+    <script>
+        const data = JSON.parse(localStorage.getItem('perfilab_user'));
+        if(data) {
+            document.getElementById('name-display').innerText = data.name.split(' ')[0];
+            document.getElementById('score-display').innerText = data.score;
+        }
+    </script>
 </body>
 </html>
