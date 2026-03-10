@@ -3,67 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diagnóstico | Perfil Lab</title>
+    <title>Diagnóstico Profissional | Perfil Lab</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        #quiz-card { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 500px; width: 90%; text-align: center; }
-        .progress-bar { background: #eee; height: 8px; border-radius: 4px; margin-bottom: 30px; overflow: hidden; }
-        #progress { background: #0078d4; height: 100%; width: 0%; transition: 0.3s; }
-        .option { display: block; width: 100%; padding: 15px; margin: 10px 0; border: 2px solid #eee; border-radius: 8px; background: none; cursor: pointer; text-align: left; font-size: 1rem; }
-        .option:hover { border-color: #0078d4; background: #f0f7ff; }
+        :root { --primary: #0078d4; --bg: #f8f9fa; --text: #333; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        #quiz-card { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 600px; width: 90%; }
         .hidden { display: none; }
-        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #0078d4; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        .btn-next { background: var(--primary); color: white; border: none; padding: 15px 30px; border-radius: 8px; cursor: pointer; width: 100%; font-size: 1.1rem; }
+        .option { display: block; width: 100%; padding: 15px; margin: 10px 0; border: 2px solid #eee; border-radius: 8px; background: none; cursor: pointer; text-align: left; transition: 0.2s; }
+        .option:hover { border-color: var(--primary); background: #f0f7ff; }
+        .progress-bar { background: #eee; height: 8px; border-radius: 4px; margin-bottom: 20px; }
+        #progress { background: var(--primary); height: 100%; width: 0%; transition: 0.3s; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
-    <div id="quiz-card">
-        <div class="progress-bar"><div id="progress"></div></div>
-        <div id="quiz-content">
-            <h2 id="question-text">Analizando...</h2>
-            <div id="options"></div>
-        </div>
-        <div id="loading" class="hidden">
-            <h2>Processando Perfil...</h2>
-            <div class="loader"></div>
-            <p>Cruzando dados com tendências de automação 2026.</p>
-        </div>
+
+<div id="quiz-card">
+    <div id="step-lead">
+        <h2 style="text-align: center;">Iniciando Diagnóstico 2026</h2>
+        <p>Para quem devemos enviar o relatório detalhado?</p>
+        <input type="text" id="user-name" placeholder="Seu Nome Completo">
+        <input type="email" id="user-email" placeholder="Seu melhor E-mail">
+        <button class="btn-next" onclick="startQuiz()">Verificar minha carreira</button>
     </div>
 
-    <script>
-        const questions = [
-            { q: "1. Como é sua rotina de trabalho?", options: [{t:"Repetitiva e baseada em dados/padrões", p:40}, {t:"Híbrida (técnica + social)", p:20}, {t:"Criativa ou Estratégica", p:5}] },
-            { q: "2. Você domina ferramentas de IA?", options: [{t:"Não, ou apenas o básico", p:30}, {t:"Sim, uso moderadamente", p:10}, {t:"Sou avançado, uso diariamente", p:0}] },
-            { q: "3. Sua função exige negociação ou gestão de crises humanas?", options: [{t:"Raramente", p:20}, {t:"Frequentemente", p:5}] },
-            { q: "4. Qual a velocidade de digitalização do seu setor?", options: [{t:"Altíssima (tudo virando software)", p:10}, {t:"Lenta (depende do físico)", p:0}] }
-        ];
+    <div id="step-quiz" class="hidden">
+        <div class="progress-bar"><div id="progress"></div></div>
+        <h3 id="question-text"></h3>
+        <div id="options"></div>
+    </div>
 
-        let current = 0, score = 0;
+    <div id="step-loading" class="hidden" style="text-align: center;">
+        <h2>Gerando seu Diagnóstico Personalizado...</h2>
+        <div class="loader"></div>
+        <p id="loading-msg">Cruzando respostas com o banco de dados da Perfil Lab...</p>
+    </div>
+</div>
 
-        function showQ() {
-            const q = questions[current];
-            document.getElementById('question-text').innerText = q.q;
-            const optDiv = document.getElementById('options');
-            optDiv.innerHTML = '';
-            q.options.forEach(o => {
-                const b = document.createElement('button');
-                b.className = 'option'; b.innerText = o.t;
-                b.onclick = () => { score += o.p; current++; if(current < questions.length) showQ(); else finish(); };
-                optDiv.appendChild(b);
-            });
-            document.getElementById('progress').style.width = (current / questions.length * 100) + "%";
-        }
+<script>
+    let userData = { name: '', email: '', score: 0 };
+    let current = 0;
 
-        function finish() {
-            document.getElementById('quiz-content').classList.add('hidden');
-            document.getElementById('loading').classList.remove('hidden');
-            setTimeout(() => {
-                // REDIRECIONAMENTO LÓGICO
-                if(score >= 60) window.location.href = "resultado-alto.html";
-                else window.location.href = "resultado-medio.html";
-            }, 3000);
-        }
-        showQ();
-    </script>
+    const questions = [
+        { q: "Qual sua área de atuação principal?", options: [{t:"Operacional/Administrativa", p:30}, {t:"Técnica/Especialista", p:15}, {t:"Liderança/Criativa", p:5}] },
+        { q: "Como é sua interação com IAs generativas hoje?", options: [{t:"Rara ou inexistente", p:30}, {t:"Uso apenas para buscas básicas", p:15}, {t:"Uso avançado integrado ao fluxo", p:0}] },
+        { q: "Sua rotina depende de análise de dados ou preenchimento de documentos?", options: [{t:"Sim, mais de 50% do meu tempo", p:25}, {t:"Ocasionalmente", p:10}, {t:"Não, meu foco é interpessoal", p:0}] },
+        { q: "Seus superiores já mencionaram automação no setor?", options: [{t:"Sim, já há planos em curso", p:15}, {t:"Não, mas sinto a pressão tecnológica", p:10}, {t:"Minha área é blindada por regulação humana", p:0}] }
+    ];
+
+    function startQuiz() {
+        userData.name = document.getElementById('user-name').value;
+        userData.email = document.getElementById('user-email').value;
+        if(!userData.name || !userData.email) return alert("Por favor, preencha os dados.");
+        
+        document.getElementById('step-lead').classList.add('hidden');
+        document.getElementById('step-quiz').classList.remove('hidden');
+        showQuestion();
+    }
+
+    function showQuestion() {
+        const q = questions[current];
+        document.getElementById('question-text').innerText = q.q;
+        const optDiv = document.getElementById('options');
+        optDiv.innerHTML = '';
+        q.options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option';
+            btn.innerText = opt.t;
+            btn.onclick = () => { userData.score += opt.p; current++; if(current < questions.length) showQuestion(); else process(); };
+            optDiv.appendChild(btn);
+        });
+        document.getElementById('progress').style.width = (current / questions.length * 100) + "%";
+    }
+
+    function process() {
+        document.getElementById('step-quiz').classList.add('hidden');
+        document.getElementById('step-loading').classList.remove('hidden');
+        
+        // Salva os dados localmente para a página de resultado ler
+        localStorage.setItem('perfilab_user', JSON.stringify(userData));
+
+        setTimeout(() => {
+            if(userData.score >= 60) window.location.href = "resultado-alto.html";
+            else window.location.href = "resultado-medio.html";
+        }, 3000);
+    }
+</script>
 </body>
 </html>
