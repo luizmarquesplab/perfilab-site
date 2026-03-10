@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultado Elite | Perfil Lab</title>
+    <style>
+        :root { --success: #27ae60; --text: #2c3e50; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f5fff8; color: var(--text); padding: 40px 20px; text-align: center; }
+        .report-card { max-width: 700px; margin: auto; background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-top: 10px solid var(--success); }
+        .score-box { background: #dcfce7; padding: 20px; border-radius: 10px; margin: 20px 0; border: 1px solid #86efac; }
+        .btn-pay { display: inline-block; background: var(--success); color: white; padding: 20px 40px; border-radius: 10px; text-decoration: none; font-weight: bold; font-size: 1.2rem; }
+    </style>
+</head>
+<body>
+    <div class="report-card">
+        <h1>Diagnóstico de Elite: <span id="name-display">...</span></h1>
+        
+        <div class="score-box">
+            <h2 style="margin:0">Índice de Risco: <span id="score-display">0</span>% (Muito Baixo)</h2>
+            <p>Sua função é predominantemente estratégica ou criativa.</p>
+        </div>
+
+        <h3>Trecho do Relatório de Liderança:</h3>
+        <div style="text-align: left; background: #f9fafb; padding: 20px; border-left: 4px solid var(--success); margin: 20px 0;">
+            "Sua posição exige alto nível de julgamento humano. No entanto, o próximo passo para o nível executivo é a <strong>Gestão de Ecossistemas de IA</strong>. O relatório aponta como você pode usar IAs como 'colaboradores' e não apenas ferramentas..."
+        </div>
+
+        <p><strong>Oportunidade:</strong> Torne-se um gestor de projetos focado em automação.</p>
+        
+        <a href="LINK_STRIPE_OU_MERCADOPAGO_BAIXO" class="btn-pay">MENTORIA: LIDERANÇA NA ERA DA IA →</a>
+    </div>
+
+    <script>
+        const data = JSON.parse(localStorage.getItem('perfilab_user'));
+        if(data) {
+            document.getElementById('name-display').innerText = data.name.split(' ')[0];
+            document.getElementById('score-display').innerText = data.score;
+        }
+    </script>
+</body>
+</html>
