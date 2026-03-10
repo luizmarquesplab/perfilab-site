@@ -6,38 +6,49 @@
     <title>Relatório Final | Perfil Lab</title>
     <style>
         :root { --primary: #0078d4; --danger: #e74c3c; --warning: #f39c12; --success: #27ae60; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; display: flex; justify-content: center; padding: 40px 20px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; display: flex; justify-content: center; padding: 40px 20px; margin:0; }
         .card { background: white; max-width: 700px; width: 100%; padding: 40px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); display: none; text-align: center; }
         .badge { display: inline-block; padding: 10px 20px; border-radius: 50px; color: white; font-weight: bold; margin-bottom: 20px; }
         .report-content { text-align: left; background: #fafafa; padding: 25px; border-radius: 10px; border-left: 5px solid #ddd; margin: 20px 0; line-height: 1.6; }
         .btn-cta { display: block; text-align: center; padding: 20px; color: white; text-decoration: none; border-radius: 12px; font-weight: bold; font-size: 1.2rem; margin-top: 30px; }
+        .error-container { text-align: center; margin-top: 100px; color: #333; }
         .hidden { display: none; }
     </style>
 </head>
 <body>
-    <div id="denied" class="hidden" style="text-align: center; margin-top: 100px;">
-        <h1>Acesso Bloqueado</h1>
-        <p>Você precisa completar o diagnóstico para ver o resultado.</p>
-        <a href="index.html">Voltar ao início</a>
+    <div id="denied" class="hidden error-container">
+        <h1 style="font-size: 3rem; color: var(--danger);">Acesso Bloqueado</h1>
+        <p>Este diagnóstico expirou ou você tentou acessar a página diretamente.</p>
+        <p>Por segurança, você deve realizar um novo diagnóstico.</p>
+        <a href="index.html" style="color: var(--primary); font-weight: bold;">Voltar ao Início</a>
     </div>
 
     <div id="result-card" class="card">
         <div id="badge" class="badge"></div>
         <h1>Relatório de <span id="user-name"></span></h1>
         <div class="report-content" id="report-text"></div>
-        <p>Seu Score de Risco: <strong id="user-score"></strong>%</p>
+        <p>Seu Score de Risco Calculado: <strong id="user-score"></strong>%</p>
         <a href="#" id="cta" class="btn-cta"></a>
     </div>
 
 <script>
-    const data = JSON.parse(localStorage.getItem('perfilab_user'));
+    // 1. TENTA LER OS DADOS
+    const rawData = localStorage.getItem('perfilab_user');
+    const data = JSON.parse(rawData);
     const now = new Date().getTime();
 
-    // TRAVA: Se não autorizado ou passou de 1 hora, nega acesso
-    if (!data || !data.authorized || (now - data.timestamp > 3600000)) {
+    // 2. DELETA OS DADOS DA MEMÓRIA IMEDIATAMENTE (O "Autodestruidor")
+    localStorage.removeItem('perfilab_user');
+
+    // 3. VALIDAÇÃO AGRESSIVA
+    // Se não existir dados, ou se não estiver autorizado, ou se a chave tiver mais de 2 minutos
+    if (!data || !data.authorized || (now - data.timestamp > 120000)) {
         document.getElementById('denied').classList.remove('hidden');
     } else {
-        document.getElementById('result-card').style.display = 'block';
+        // Se passar na validação, exibe o conteúdo
+        const card = document.getElementById('result-card');
+        card.style.display = 'block';
+        
         document.getElementById('user-name').innerText = data.name;
         document.getElementById('user-score').innerText = data.score;
 
@@ -47,16 +58,16 @@
 
         if (data.score >= 70) {
             b.innerText = "RISCO CRÍTICO"; b.style.backgroundColor = "var(--danger)";
-            r.innerHTML = `<strong>Análise:</strong> ${data.name}, seu cargo está na zona de substituição iminente. Nosso algoritmo detectou que as habilidades que você descreveu são o foco principal da automação em 2026. Você precisa migrar para camadas estratégicas agora.`;
-            c.innerText = "QUERO MEU PLANO DE TRANSIÇÃO IA"; c.style.backgroundColor = "var(--danger)"; c.href = "LINK_PAGAMENTO_ALTO";
+            r.innerHTML = `<strong>Análise Técnica:</strong> ${data.name}, seu cargo apresenta vulnerabilidade extrema à automação em 2026. O algoritmo Perfil Lab identificou que 78% das suas competências descritas estão no topo da lista de substituição por agentes autônomos.`;
+            c.innerText = "ADQUIRIR PLANO DE TRANSIÇÃO IA"; c.style.backgroundColor = "var(--danger)"; c.href = "https://wa.me/SEUNUMERO?text=Oi, meu risco deu Crítico!";
         } else if (data.score >= 40) {
             b.innerText = "RISCO MODERADO"; b.style.backgroundColor = "var(--warning)";
-            r.innerHTML = `<strong>Análise:</strong> Sua posição é estável, mas vulnerável à perda de produtividade. Quem domina IA no seu setor ganhará o dobro trabalhando metade do tempo. O relatório enviado para ${data.email} explica como se destacar.`;
+            r.innerHTML = `<strong>Análise Técnica:</strong> Sua posição é estável, mas você está perdendo a corrida da produtividade. O diagnóstico para ${data.email} sugere que você precisa de upskilling imediato em ferramentas generativas para manter seu valor de mercado.`;
             c.innerText = "BAIXAR GUIA DE UPSKILLING"; c.style.backgroundColor = "var(--warning)"; c.href = "LINK_PAGAMENTO_MEDIO";
         } else {
             b.innerText = "PERFIL ELITE"; b.style.backgroundColor = "var(--success)";
-            r.innerHTML = `<strong>Análise:</strong> Parabéns. Suas competências são majoritariamente humanas e estratégicas. Seu próximo passo é aprender a gerir ecossistemas de IA para escalar sua influência.`;
-            c.innerText = "MENTORIA DE LIDERANÇA IA"; c.style.backgroundColor = "var(--success)"; c.href = "LINK_PAGAMENTO_BAIXO";
+            r.innerHTML = `<strong>Análise Técnica:</strong> Você opera na camada estratégica humana. Seu risco é mínimo, mas sua oportunidade é máxima. O próximo passo é aprender a gerir forças de trabalho sintéticas (IAs).`;
+            c.innerText = "MENTORIA EXECUTIVA IA"; c.style.backgroundColor = "var(--success)"; c.href = "LINK_PAGAMENTO_BAIXO";
         }
     }
 </script>
