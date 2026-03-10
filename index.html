@@ -3,22 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perfil Lab | Inteligência de Carreira</title>
+    <title>Perfil Lab | O Futuro do Trabalho</title>
     <style>
-        :root { --primary: #0078d4; --dark: #0a0a0a; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--dark); color: white; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; text-align: center; }
-        .hero { max-width: 800px; padding: 20px; }
-        h1 { font-size: clamp(2.5rem, 8vw, 4rem); background: linear-gradient(90deg, #fff, #00c6ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 20px; }
-        p { font-size: 1.2rem; color: #ccc; margin-bottom: 40px; line-height: 1.6; }
-        .btn-start { background: var(--primary); color: white; padding: 22px 50px; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 1.3rem; transition: 0.3s; display: inline-block; border: none; cursor: pointer; }
-        .btn-start:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(0, 120, 212, 0.4); }
+        :root { --blue: #0078d4; --dark: #050505; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--dark); color: white; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; text-align: center; }
+        .container { max-width: 700px; padding: 20px; }
+        h1 { font-size: 3.5rem; background: linear-gradient(to right, #fff, var(--blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; }
+        p { font-size: 1.2rem; color: #aaa; margin-bottom: 30px; }
+        .btn { background: var(--blue); color: white; padding: 20px 40px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 1.2rem; transition: 0.3s; display: inline-block; }
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0, 120, 212, 0.3); }
     </style>
 </head>
 <body>
-    <div class="hero">
-        <h1>Sua profissão resistirá à IA até o fim de 2026?</h1>
-        <p>Descubra seu índice de substituibilidade e receba um plano de ação personalizado baseado no seu perfil real.</p>
-        <a href="diagnostico.html" class="btn-start">INICIAR DIAGNÓSTICO GRATUITO</a>
+    <div class="container">
+        <h1>Sua carreira sobrevive à IA?</h1>
+        <p>Descubra seu índice de risco e receba um plano de ação personalizado gerado por Inteligência Artificial para 2026.</p>
+        <a href="diagnostico.html" class="btn">INICIAR DIAGNÓSTICO GRATUITO</a>
     </div>
+    <script>localStorage.removeItem('perfilab_user');</script>
 </body>
 </html>
