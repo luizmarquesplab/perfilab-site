@@ -94,6 +94,7 @@
       border-radius: 8px;
       padding: 10px;
       font-size: 14px;
+      white-space: pre-wrap;
     }
 
     .loading-wrap {
@@ -113,6 +114,18 @@
     .small-muted {
       color: #666;
       font-size: 14px;
+    }
+
+    .debug-box {
+      margin-top: 12px;
+      padding: 10px;
+      background: #f5f7fa;
+      border: 1px solid #d0d7de;
+      border-radius: 8px;
+      font-size: 12px;
+      color: #333;
+      text-align: left;
+      white-space: pre-wrap;
     }
 
     @keyframes spin {
@@ -147,16 +160,18 @@
         <h3>Analisando suas respostas...</h3>
         <p class="small-muted">Gravando seus dados e preparando seu score.</p>
         <div id="sendError" class="error-box hidden"></div>
+        <div id="debugBox" class="debug-box hidden"></div>
       </div>
     </div>
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw_btw9zJdEQ_q44A6CSOzh7FLVRkMiGDNjjTvjqJfuSlMVy64_mNLUpxI8hvhpG886/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby8ha4RK3IWQRmgUdkpAYDDNGtvK_Ld8_Y7r7Y5GTd4qBF5Df2Cj_xLrixleu41oo48/exec";
     const SCORE_MAXIMO = 80;
 
     let scoreTotal = 0;
     let current = 0;
+    let leadData = null;
 
     const questions = [
       {
@@ -218,6 +233,12 @@
       const box = document.getElementById("sendError");
       box.textContent = "";
       box.classList.add("hidden");
+    }
+
+    function showDebug(message) {
+      const box = document.getElementById("debugBox");
+      box.textContent = message;
+      box.classList.remove("hidden");
     }
 
     function validarEmail(email) {
@@ -284,7 +305,7 @@
         return;
       }
 
-      window.perfilabLead = {
+      leadData = {
         nome: name,
         email: email,
         whatsapp: phone
@@ -303,9 +324,9 @@
 
       const payload = {
         action: "lead_capture",
-        nome: window.perfilabLead.nome,
-        email: window.perfilabLead.email,
-        whatsapp: window.perfilabLead.whatsapp,
+        nome: leadData.nome,
+        email: leadData.email,
+        whatsapp: leadData.whatsapp,
         score_bruto: scoreTotal,
         score_percentual: calcularScorePercentual(scoreTotal),
         timestamp: Date.now(),
@@ -313,47 +334,45 @@
       };
 
       localStorage.setItem("perfilab_user", JSON.stringify(payload));
+      showDebug("Payload enviado:\n" + JSON.stringify(payload, null, 2));
 
       try {
         const response = await fetch(SCRIPT_URL, {
           method: "POST",
-          headers: {
-            "Content-Type": "text/plain;charset=utf-8"
-          },
           body: JSON.stringify(payload)
         });
 
         const text = await response.text();
+        showDebug(
+          "Payload enviado:\n" + JSON.stringify(payload, null, 2) +
+          "\n\nResposta bruta do Apps Script:\n" + text
+        );
 
         let result;
         try {
           result = JSON.parse(text);
         } catch (e) {
-          throw new Error("Resposta inválida do Apps Script: " + text);
+          throw new Error("Resposta do Apps Script não é JSON válido.");
         }
 
         if (!result.ok) {
           throw new Error(result.message || "Falha ao gravar lead.");
         }
 
-        if (result.payment_link) {
-          const stored = JSON.parse(localStorage.getItem("perfilab_user") || "{}");
-          stored.payment_link = result.payment_link;
-          stored.product_type = result.product_type || "";
-          localStorage.setItem("perfilab_user", JSON.stringify(stored));
-        }
+        const stored = JSON.parse(localStorage.getItem("perfilab_user") || "{}");
+        stored.payment_link = result.payment_link || "";
+        stored.product_type = result.product_type || "";
+        localStorage.setItem("perfilab_user", JSON.stringify(stored));
 
         window.location.href = "resultado.html";
       } catch (error) {
         console.error("Erro ao enviar lead:", error);
-        showSendError("Não foi possível registrar os dados. Verifique a URL do Apps Script, a implantação do Web App e tente novamente.");
+        showSendError("Erro ao registrar os dados:\n" + error.message);
       }
     }
 
     document.addEventListener("DOMContentLoaded", function() {
-      const startBtn = document.getElementById("startBtn");
-      startBtn.addEventListener("click", startQuiz);
-      console.log("Diagnóstico carregado com sucesso.");
+      document.getElementById("startBtn").addEventListener("click", startQuiz);
     });
   </script>
 </body>
