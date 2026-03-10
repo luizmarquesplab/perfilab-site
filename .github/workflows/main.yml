@@ -1,4 +1,4 @@
-name: Deploy Website to Azure Storage
+name: Azure Static Web Apps CI/CD
 
 on:
   push:
@@ -6,19 +6,17 @@ on:
       - main
 
 jobs:
-  build-and-deploy:
+  build_and_deploy_job:
     runs-on: ubuntu-latest
+    name: Build and Deploy
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-    - name: Log in to Azure
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }} # Opcional se usar apenas storage, mas vamos simplificar usando a conexão direta abaixo
-
-    - name: Upload to Azure Storage
-      uses: azure/CLI@v1
-      with:
-        inlineScript: |
-          az storage blob upload-batch --account-name perfilabstorage --auth-mode key --account-key "${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" -d '$web' -s . --overwrite
+      - name: Build and Deploy
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: "upload"
+          app_location: "/"
+          output_location: "/"
