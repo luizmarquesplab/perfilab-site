@@ -1,54 +1,113 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Seu Resultado | Perfil Lab</title>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; text-align: center; padding: 50px 20px; margin: 0; }
-        .card { background: white; max-width: 600px; margin: 0 auto; padding: 40px; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
-        .score { font-size: 5rem; font-weight: bold; color: #0078d4; margin: 10px 0; }
-        .btn-pay { display: block; background: #0078d4; color: white; padding: 22px; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 1.2rem; margin-top: 30px; transition: 0.3s; }
-        .btn-pay:hover { background: #005fa3; transform: scale(1.02); }
-        .desc { font-size: 1.1rem; color: #444; line-height: 1.6; text-align: left; background: #f9f9f9; padding: 20px; border-radius: 12px; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Seu Resultado | Perfil Lab</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f2f5;
+      text-align: center;
+      padding: 50px 20px;
+      margin: 0;
+    }
+
+    .card {
+      background: white;
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 40px;
+      border-radius: 24px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+
+    .score {
+      font-size: 5rem;
+      font-weight: bold;
+      color: #0078d4;
+      margin: 10px 0;
+    }
+
+    .desc {
+      font-size: 1.05rem;
+      color: #444;
+      line-height: 1.6;
+      text-align: left;
+      background: #f9f9f9;
+      padding: 20px;
+      border-radius: 12px;
+      margin-top: 25px;
+    }
+
+    .btn-pay {
+      display: block;
+      background: #0078d4;
+      color: white;
+      padding: 20px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-top: 30px;
+    }
+
+    .debug {
+      margin-top: 20px;
+      text-align: left;
+      background: #f5f7fa;
+      border: 1px solid #d0d7de;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 12px;
+      color: #333;
+      white-space: pre-wrap;
+    }
+  </style>
 </head>
 <body>
-    <div id="main" class="card" style="display:none;">
-        <h1 style="margin-bottom:0;">Análise de <span id="userName"></span></h1>
-        <p style="color:#666;">Seu risco de substituição por IA em 2026 é:</p>
-        <div class="score"><span id="userScore"></span>%</div>
-        
-        <div class="desc" id="userDesc"></div>
+  <div id="main" class="card" style="display:none;">
+    <h1 style="margin-bottom:0;">Análise de <span id="userName"></span></h1>
+    <p style="color:#666;">Seu risco de substituição por IA em 2026 é:</p>
 
-        <a href="#" id="payLink" class="btn-pay">LIBERAR RELATÓRIO PERSONALIZADO</a>
-        <p style="font-size: 0.8rem; color: #999; margin-top: 15px;">✓ Gerado por IA em tempo real com base no seu perfil.</p>
-    </div>
+    <div class="score"><span id="userScore"></span>%</div>
 
-    <script>
-        const d = JSON.parse(localStorage.getItem('perfilab_user'));
-        
-        // Verifica se a sessão é válida (5 minutos)
-        if(!d || (new Date().getTime() - d.timestamp > 300000)) {
-            window.location.href = "index.html";
-        } else {
-            document.getElementById('main').style.display = 'block';
-            document.getElementById('userName').innerText = d.name;
-            document.getElementById('userScore').innerText = d.score;
-            
-            const link = document.getElementById('payLink');
-            const desc = document.getElementById('userDesc');
+    <div class="desc" id="userDesc"></div>
 
-            if(d.score >= 70) {
-                desc.innerHTML = "<strong>CRÍTICO:</strong> Suas funções possuem alta similaridade com capacidades de Agentes de IA. O relatório incluirá um <strong>Plano de Transição de Carreira</strong> urgente.";
-                link.href = "https://buy.stripe.com/8x26oHgWEbB262s2ey4c802";
-            } else if(d.score >= 40) {
-                desc.innerHTML = "<strong>MODERADO:</strong> Você está em risco de estagnação. O relatório incluirá o <strong>Guia de Upskilling</strong> com ferramentas para dobrar sua produtividade.";
-                link.href = "https://buy.stripe.com/eVqaEX5dW7kMeyY1au4c801";
-            } else {
-                desc.innerHTML = "<strong>ELITE:</strong> Suas competências são majoritariamente humanas. O relatório focará em <strong>Liderança de Ecossistemas de IA</strong> para escalar sua carreira.";
-                link.href = "https://buy.stripe.com/00wbJ10XGawY62s5qK4c800";
-            }
-        }
-    </script>
+    <a href="#" id="payLink" class="btn-pay">LIBERAR RELATÓRIO PERSONALIZADO</a>
+
+    <div id="debugData" class="debug"></div>
+  </div>
+
+  <script>
+    const d = JSON.parse(localStorage.getItem("perfilab_user") || "null");
+
+    if (!d || !d.nome || d.score_percentual === undefined || d.score_percentual === null) {
+      window.location.href = "index.html";
+    } else {
+      document.getElementById("main").style.display = "block";
+      document.getElementById("userName").innerText = d.nome;
+      document.getElementById("userScore").innerText = d.score_percentual;
+      document.getElementById("debugData").innerText = JSON.stringify(d, null, 2);
+
+      const link = document.getElementById("payLink");
+      const desc = document.getElementById("userDesc");
+
+      if (d.score_percentual >= 70) {
+        desc.innerHTML = "<strong>CRÍTICO:</strong> Suas funções possuem alta similaridade com atividades passíveis de automação. O relatório detalhado focará em reposicionamento, adaptação e mitigação de risco.";
+      } else if (d.score_percentual >= 40) {
+        desc.innerHTML = "<strong>MODERADO:</strong> Você está em zona intermediária de risco. O relatório detalhado focará em upskilling, aumento de produtividade e diferenciação profissional.";
+      } else {
+        desc.innerHTML = "<strong>ELITE:</strong> Suas competências são predominantemente humanas e difíceis de automatizar. O relatório detalhado focará em liderança, alavancagem e posicionamento estratégico.";
+      }
+
+      if (d.payment_link) {
+        link.href = d.payment_link;
+      } else {
+        link.href = "#";
+        link.innerText = "LINK DE PAGAMENTO INDISPONÍVEL";
+      }
+    }
+  </script>
 </body>
 </html>
