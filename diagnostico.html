@@ -3,31 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diagnóstico Profissional | Perfil Lab</title>
+    <title>Diagnóstico | Perfil Lab</title>
     <style>
-        :root { --primary: #0078d4; --bg: #f8f9fa; --text: #333; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        #quiz-card { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 600px; width: 90%; }
+        :root { --primary: #0078d4; --bg: #f8f9fa; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        #quiz-card { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 600px; width: 95%; }
         .hidden { display: none; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
-        .btn-next { background: var(--primary); color: white; border: none; padding: 15px 30px; border-radius: 8px; cursor: pointer; width: 100%; font-size: 1.1rem; }
-        .option { display: block; width: 100%; padding: 15px; margin: 10px 0; border: 2px solid #eee; border-radius: 8px; background: none; cursor: pointer; text-align: left; transition: 0.2s; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; }
+        .btn-next { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 8px; width: 100%; font-size: 1.1rem; cursor: pointer; font-weight: bold; }
+        .option { display: block; width: 100%; padding: 15px; margin: 8px 0; border: 2px solid #eee; border-radius: 8px; background: none; text-align: left; cursor: pointer; transition: 0.2s; }
         .option:hover { border-color: var(--primary); background: #f0f7ff; }
-        .progress-bar { background: #eee; height: 8px; border-radius: 4px; margin-bottom: 20px; }
+        .progress-bar { background: #eee; height: 8px; border-radius: 4px; margin-bottom: 25px; }
         #progress { background: var(--primary); height: 100%; width: 0%; transition: 0.3s; }
         .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
-
 <div id="quiz-card">
     <div id="step-lead">
-        <h2 style="text-align: center;">Iniciando Diagnóstico 2026</h2>
-        <p>Para quem devemos enviar o relatório detalhado?</p>
-        <input type="text" id="user-name" placeholder="Seu Nome Completo">
-        <input type="email" id="user-email" placeholder="Seu melhor E-mail">
-        <button class="btn-next" onclick="startQuiz()">Verificar minha carreira</button>
+        <h2>Iniciando Diagnóstico</h2>
+        <input type="text" id="user-name" placeholder="Nome Completo">
+        <input type="email" id="user-email" placeholder="E-mail Profissional">
+        <input type="tel" id="user-phone" placeholder="WhatsApp (DDD + Número)">
+        <button class="btn-next" onclick="startQuiz()">Verificar minha carreira →</button>
     </div>
 
     <div id="step-quiz" class="hidden">
@@ -37,59 +36,60 @@
     </div>
 
     <div id="step-loading" class="hidden" style="text-align: center;">
-        <h2>Gerando seu Diagnóstico Personalizado...</h2>
+        <h2>Processando seu Perfil...</h2>
         <div class="loader"></div>
-        <p id="loading-msg">Cruzando respostas com o banco de dados da Perfil Lab...</p>
+        <p>Cruzando dados com tendências de automação 2026.</p>
     </div>
 </div>
 
 <script>
-    let userData = { name: '', email: '', score: 0 };
+    let userData = { name: '', email: '', phone: '', score: 0, authorized: false };
     let current = 0;
 
     const questions = [
-        { q: "Qual sua área de atuação principal?", options: [{t:"Operacional/Administrativa", p:30}, {t:"Técnica/Especialista", p:15}, {t:"Liderança/Criativa", p:5}] },
-        { q: "Como é sua interação com IAs generativas hoje?", options: [{t:"Rara ou inexistente", p:30}, {t:"Uso apenas para buscas básicas", p:15}, {t:"Uso avançado integrado ao fluxo", p:0}] },
-        { q: "Sua rotina depende de análise de dados ou preenchimento de documentos?", options: [{t:"Sim, mais de 50% do meu tempo", p:25}, {t:"Ocasionalmente", p:10}, {t:"Não, meu foco é interpessoal", p:0}] },
-        { q: "Seus superiores já mencionaram automação no setor?", options: [{t:"Sim, já há planos em curso", p:15}, {t:"Não, mas sinto a pressão tecnológica", p:10}, {t:"Minha área é blindada por regulação humana", p:0}] }
+        { q: "1. Sua rotina de trabalho é composta por processos repetitivos?", options: [{t:"Sim, totalmente.", p:20}, {t:"Parcialmente.", p:10}, {t:"Não, cada dia é diferente.", p:5}] },
+        { q: "2. Você utiliza IA Generativa no seu dia a dia?", options: [{t:"Nunca usei.", p:15}, {t:"Uso raramente.", p:10}, {t:"Uso diariamente.", p:0}] },
+        { q: "3. Qual sua área de atuação principal?", options: [{t:"Exatas/Dados/ADM.", p:15}, {t:"Saúde/Educação.", p:10}, {t:"Artes/Estratégia.", p:5}] },
+        { q: "4. Seu trabalho exige tomada de decisão baseada em empatia?", options: [{t:"Raramente.", p:10}, {t:"Frequentemente.", p:2}] },
+        { q: "5. Volume de análise de documentos/planilhas?", options: [{t:"Muito alto.", p:10}, {t:"Moderado.", p:5}, {t:"Baixo.", p:0}] },
+        { q: "6. A IA já está automatizando partes do seu setor?", options: [{t:"Sim, sinto pressão.", p:10}, {t:"Não sinto impacto.", p:0}] },
+        { q: "7. Quanto do seu cargo depende de negociação complexa?", options: [{t:"Pouco.", p:5}, {t:"Muito.", p:0}] },
+        { q: "8. Buscou atualização sobre IA nos últimos 6 meses?", options: [{t:"Não.", p:5}, {t:"Sim.", p:0}] },
+        { q: "9. Empresa tem planos de automação este ano?", options: [{t:"Sim.", p:5}, {t:"Não.", p:0}] },
+        { q: "10. Sente-se seguro para uma transição de carreira?", options: [{t:"Não.", p:5}, {t:"Sim.", p:0}] }
     ];
 
     function startQuiz() {
         userData.name = document.getElementById('user-name').value;
         userData.email = document.getElementById('user-email').value;
-        if(!userData.name || !userData.email) return alert("Por favor, preencha os dados.");
-        
+        userData.phone = document.getElementById('user-phone').value;
+        if(!userData.name || !userData.email || !userData.phone) return alert("Preencha todos os dados.");
         document.getElementById('step-lead').classList.add('hidden');
         document.getElementById('step-quiz').classList.remove('hidden');
-        showQuestion();
+        showQ();
     }
 
-    function showQuestion() {
+    function showQ() {
         const q = questions[current];
         document.getElementById('question-text').innerText = q.q;
         const optDiv = document.getElementById('options');
         optDiv.innerHTML = '';
-        q.options.forEach(opt => {
-            const btn = document.createElement('button');
-            btn.className = 'option';
-            btn.innerText = opt.t;
-            btn.onclick = () => { userData.score += opt.p; current++; if(current < questions.length) showQuestion(); else process(); };
-            optDiv.appendChild(btn);
+        q.options.forEach(o => {
+            const b = document.createElement('button');
+            b.className = 'option'; b.innerText = o.t;
+            b.onclick = () => { userData.score += o.p; current++; if(current < questions.length) showQ(); else finish(); };
+            optDiv.appendChild(b);
         });
         document.getElementById('progress').style.width = (current / questions.length * 100) + "%";
     }
 
-    function process() {
+    function finish() {
+        userData.authorized = true;
+        userData.timestamp = new Date().getTime();
+        localStorage.setItem('perfilab_user', JSON.stringify(userData));
         document.getElementById('step-quiz').classList.add('hidden');
         document.getElementById('step-loading').classList.remove('hidden');
-        
-        // Salva os dados localmente para a página de resultado ler
-        localStorage.setItem('perfilab_user', JSON.stringify(userData));
-
-        setTimeout(() => {
-            if(userData.score >= 60) window.location.href = "resultado-alto.html";
-            else window.location.href = "resultado-medio.html";
-        }, 3000);
+        setTimeout(() => { window.location.href = "resultado.html"; }, 3000);
     }
 </script>
 </body>
