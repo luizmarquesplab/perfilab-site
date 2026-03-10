@@ -1,0 +1,22 @@
+{
+  "routes": [
+    {
+      "route": "/*",
+      "allowedRoles": ["anonymous"]
+    }
+  ],
+  "responseOverrides": {
+    "404": {
+      "redirect": "/",
+      "statusCode": 302
+    }
+  },
+  "globalHeaders": {},
+  "navigationFallback": {
+    "rewrite": "/index.html"
+  },
+  "mimeTypes": {},
+  "platform": {
+    "apiRuntime": "node:18"
+  }
+}
