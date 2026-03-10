@@ -3,21 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perfil Lab | Futuro do Trabalho 2026</title>
+    <title>Perfil Lab | Futuro do Trabalho & IA</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #0a0a0a; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; text-align: center; }
-        .hero { max-width: 800px; padding: 20px; }
-        h1 { font-size: 3rem; margin-bottom: 20px; background: linear-gradient(90deg, #0078d4, #00c6ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        p { font-size: 1.2rem; color: #ccc; margin-bottom: 40px; }
-        .btn-start { background: #0078d4; color: white; padding: 20px 40px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 1.2rem; transition: 0.3s; border: none; cursor: pointer; }
-        .btn-start:hover { background: #005a9e; box-shadow: 0 0 20px rgba(0, 120, 212, 0.6); }
+        :root {
+            --primary: #0078d4;
+            --accent: #00c6ff;
+            --dark: #0a0a0a;
+            --text-gray: #b0b0b0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--dark);
+            color: white;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .hero {
+            max-width: 900px;
+            padding: 40px 20px;
+            text-align: center;
+            z-index: 2;
+        }
+
+        .badge {
+            background: rgba(0, 120, 212, 0.1);
+            border: 1px solid var(--primary);
+            color: var(--accent);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            line-height: 1.1;
+            margin-bottom: 25px;
+            background: linear-gradient(135deg, #fff 30%, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p {
+            font-size: clamp(1.1rem, 3vw, 1.4rem);
+            color: var(--text-gray);
+            margin-bottom: 45px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.5;
+        }
+
+        .btn-main {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 22px 50px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.3rem;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0, 120, 212, 0.3);
+        }
+
+        .btn-main:hover {
+            transform: scale(1.05);
+            background: #0086ed;
+            box-shadow: 0 15px 30px rgba(0, 120, 212, 0.5);
+        }
+
+        /* Efeito de fundo tecnológico */
+        .bg-glow {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: var(--primary);
+            filter: blur(150px);
+            opacity: 0.15;
+            z-index: 1;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .footer-info {
+            margin-top: 60px;
+            font-size: 0.8rem;
+            color: #444;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
     </style>
 </head>
 <body>
+
+    <div class="bg-glow"></div>
+
     <div class="hero">
-        <h1>Sua profissão sobreviverá à IA até o fim de 2026?</h1>
-        <p>A automação não é mais uma previsão, é a realidade. Faça o diagnóstico gratuito e descubra seu índice de substituibilidade.</p>
-        <a href="diagnostico.html" class="btn-start">INICIAR DIAGNÓSTICO GRATUITO</a>
+        <div class="badge">Relatório Perfil Lab 2026</div>
+        <h1>Sua profissão resistirá à <br> próxima onda de IA?</h1>
+        <p>Não somos mais substituídos por máquinas, mas por humanos que dominam a IA. Descubra seu índice de risco e receba um plano de ação personalizado.</p>
+        
+        <a href="diagnostico.html" class="btn-main">
+            INICIAR DIAGNÓSTICO GRATUITO →
+        </a>
+
+        <div class="footer-info">
+            <span>✓ Algoritmo Atualizado Março/2026</span>
+            <span>✓ +15.000 Profissionais Analisados</span>
+            <span>✓ Diagnóstico em 2 Minutos</span>
+        </div>
     </div>
+
 </body>
 </html>
