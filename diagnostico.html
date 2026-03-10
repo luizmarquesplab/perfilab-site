@@ -22,7 +22,7 @@
 <body>
 <div id="quiz-card">
     <div id="step-lead">
-        <h2>Iniciando Diagnóstico</h2>
+        <h2 style="text-align:center">Diagnóstico de Carreira 2026</h2>
         <input type="text" id="user-name" placeholder="Nome Completo">
         <input type="email" id="user-email" placeholder="E-mail Profissional">
         <input type="tel" id="user-phone" placeholder="WhatsApp (DDD + Número)">
@@ -38,7 +38,7 @@
     <div id="step-loading" class="hidden" style="text-align: center;">
         <h2>Processando seu Perfil...</h2>
         <div class="loader"></div>
-        <p>Cruzando dados com tendências de automação 2026.</p>
+        <p>Analisando dados de mercado para 2026...</p>
     </div>
 </div>
 
@@ -84,9 +84,11 @@
     }
 
     function finish() {
+        // GERAÇÃO DA CHAVE ÚNICA
         userData.authorized = true;
         userData.timestamp = new Date().getTime();
         localStorage.setItem('perfilab_user', JSON.stringify(userData));
+        
         document.getElementById('step-quiz').classList.add('hidden');
         document.getElementById('step-loading').classList.remove('hidden');
         setTimeout(() => { window.location.href = "resultado.html"; }, 3000);
