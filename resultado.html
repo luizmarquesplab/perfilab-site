@@ -1,73 +1,54 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seu Resultado | Perfil Lab</title>
     <style>
-        :root { --primary: #0078d4; --danger: #ff4d4d; --warning: #ff9f43; --success: #2ecc71; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; display: flex; justify-content: center; padding: 40px 20px; margin: 0; }
-        .card { background: white; max-width: 600px; width: 100%; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; display: none; }
-        .badge { display: inline-block; padding: 8px 20px; border-radius: 50px; color: white; font-weight: bold; margin-bottom: 20px; font-size: 0.9rem; }
-        h1 { margin: 10px 0; color: #333; }
-        .score-box { font-size: 4rem; font-weight: bold; margin: 20px 0; color: var(--primary); }
-        .description { text-align: left; background: #f8f9fa; padding: 20px; border-radius: 12px; border-left: 5px solid #ddd; line-height: 1.6; }
-        .btn-pay { display: block; background: var(--primary); color: white; text-decoration: none; padding: 20px; border-radius: 12px; font-weight: bold; font-size: 1.1rem; margin-top: 30px; transition: 0.3s; }
-        .btn-pay:hover { opacity: 0.9; transform: scale(1.02); }
-        .expired { text-align: center; margin-top: 100px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; text-align: center; padding: 50px 20px; margin: 0; }
+        .card { background: white; max-width: 600px; margin: 0 auto; padding: 40px; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+        .score { font-size: 5rem; font-weight: bold; color: #0078d4; margin: 10px 0; }
+        .btn-pay { display: block; background: #0078d4; color: white; padding: 22px; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 1.2rem; margin-top: 30px; transition: 0.3s; }
+        .btn-pay:hover { background: #005fa3; transform: scale(1.02); }
+        .desc { font-size: 1.1rem; color: #444; line-height: 1.6; text-align: left; background: #f9f9f9; padding: 20px; border-radius: 12px; }
     </style>
 </head>
 <body>
-    <div id="result-container" class="card">
-        <div id="risk-badge" class="badge"></div>
-        <h1>Olá, <span id="display-name"></span>!</h1>
-        <p>Seu índice de substituibilidade por IA em 2026 é:</p>
-        <div class="score-box"><span id="display-score"></span>%</div>
-        <div class="description" id="display-text"></div>
-        <a href="#" id="pay-link" class="btn-pay">LIBERAR MEU RELATÓRIO COMPLETO</a>
-    </div>
+    <div id="main" class="card" style="display:none;">
+        <h1 style="margin-bottom:0;">Análise de <span id="userName"></span></h1>
+        <p style="color:#666;">Seu risco de substituição por IA em 2026 é:</p>
+        <div class="score"><span id="userScore"></span>%</div>
+        
+        <div class="desc" id="userDesc"></div>
 
-    <div id="error-screen" class="expired" style="display:none;">
-        <h1>Sessão Expirada</h1>
-        <p>Por segurança, refaça o teste.</p>
-        <a href="index.html">Voltar ao início</a>
+        <a href="#" id="payLink" class="btn-pay">LIBERAR RELATÓRIO PERSONALIZADO</a>
+        <p style="font-size: 0.8rem; color: #999; margin-top: 15px;">✓ Gerado por IA em tempo real com base no seu perfil.</p>
     </div>
 
     <script>
-        const data = JSON.parse(localStorage.getItem('perfilab_user'));
-        const now = new Date().getTime();
-
-        // Trava: Se não houver dados ou passar de 5 min, bloqueia
-        if (!data || !data.authorized || (now - data.timestamp > 300000)) {
-            document.getElementById('error-screen').style.display = 'block';
+        const d = JSON.parse(localStorage.getItem('perfilab_user'));
+        
+        // Verifica se a sessão é válida (5 minutos)
+        if(!d || (new Date().getTime() - d.timestamp > 300000)) {
+            window.location.href = "index.html";
         } else {
-            document.getElementById('result-container').style.display = 'block';
-            document.getElementById('display-name').innerText = data.name;
-            document.getElementById('display-score').innerText = data.score;
+            document.getElementById('main').style.display = 'block';
+            document.getElementById('userName').innerText = d.name;
+            document.getElementById('userScore').innerText = d.score;
             
-            const badge = document.getElementById('risk-badge');
-            const text = document.getElementById('display-text');
-            const btn = document.getElementById('pay-link');
+            const link = document.getElementById('payLink');
+            const desc = document.getElementById('userDesc');
 
-            if (data.score >= 70) {
-                badge.innerText = "RISCO CRÍTICO"; badge.style.background = "var(--danger)";
-                text.innerHTML = "<strong>Diagnóstico:</strong> Suas funções atuais possuem alto potencial de automação por agentes autônomos. Você precisa de um plano de transição urgente.";
-                btn.innerText = "LIBERAR PLANO DE TRANSIÇÃO (R$ 97)";
-                btn.href = "https://buy.stripe.com/8x26oHgWEbB262s2ey4c802";
-            } else if (data.score >= 40) {
-                badge.innerText = "RISCO MODERADO"; badge.style.background = "var(--warning)";
-                text.innerHTML = "<strong>Diagnóstico:</strong> Você está em uma zona de transição. Sua produtividade pode dobrar com IA, mas sua posição exige atualização de ferramentas.";
-                btn.innerText = "BAIXAR GUIA DE UPSKILLING (R$ 47)";
-                btn.href = "https://buy.stripe.com/eVqaEX5dW7kMeyY1au4c801";
+            if(d.score >= 70) {
+                desc.innerHTML = "<strong>CRÍTICO:</strong> Suas funções possuem alta similaridade com capacidades de Agentes de IA. O relatório incluirá um <strong>Plano de Transição de Carreira</strong> urgente.";
+                link.href = "https://buy.stripe.com/8x26oHgWEbB262s2ey4c802";
+            } else if(d.score >= 40) {
+                desc.innerHTML = "<strong>MODERADO:</strong> Você está em risco de estagnação. O relatório incluirá o <strong>Guia de Upskilling</strong> com ferramentas para dobrar sua produtividade.";
+                link.href = "https://buy.stripe.com/eVqaEX5dW7kMeyY1au4c801";
             } else {
-                badge.innerText = "PERFIL ELITE"; badge.style.background = "var(--success)";
-                text.innerHTML = "<strong>Diagnóstico:</strong> Seu perfil é altamente estratégico e humano. O próximo nível é aprender a gerir ecossistemas de IA para escalar seus resultados.";
-                btn.innerText = "MENTORIA EXECUTIVA IA (R$ 147)";
-                btn.href = "https://buy.stripe.com/00wbJ10XGawY62s5qK4c800";
+                desc.innerHTML = "<strong>ELITE:</strong> Suas competências são majoritariamente humanas. O relatório focará em <strong>Liderança de Ecossistemas de IA</strong> para escalar sua carreira.";
+                link.href = "https://buy.stripe.com/00wbJ10XGawY62s5qK4c800";
             }
         }
-        // Limpa o dado para não permitir múltiplos acessos pelo mesmo link
-        localStorage.removeItem('perfilab_user');
     </script>
 </body>
 </html>
