@@ -3,95 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diagnóstico Profissional | Perfil Lab</title>
+    <title>Diagnóstico | Perfil Lab</title>
     <style>
-        :root { --primary: #0078d4; --bg: #f8f9fa; --text: #333; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        #quiz-card { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 600px; width: 90%; text-align: center; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        #quiz-card { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 500px; width: 90%; text-align: center; }
         .progress-bar { background: #eee; height: 8px; border-radius: 4px; margin-bottom: 30px; overflow: hidden; }
-        #progress { background: var(--primary); height: 100%; width: 0%; transition: 0.3s; }
-        h2 { margin-bottom: 25px; font-size: 1.4rem; }
-        .option { display: block; width: 100%; padding: 15px; margin: 10px 0; border: 2px solid #eee; border-radius: 8px; background: none; cursor: pointer; text-align: left; font-size: 1rem; transition: 0.2s; }
-        .option:hover { border-color: var(--primary); background: #f0f7ff; }
+        #progress { background: #0078d4; height: 100%; width: 0%; transition: 0.3s; }
+        .option { display: block; width: 100%; padding: 15px; margin: 10px 0; border: 2px solid #eee; border-radius: 8px; background: none; cursor: pointer; text-align: left; font-size: 1rem; }
+        .option:hover { border-color: #0078d4; background: #f0f7ff; }
         .hidden { display: none; }
-        .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #0078d4; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
-
-<div id="quiz-card">
-    <div class="progress-bar"><div id="progress"></div></div>
-    
-    <div id="question-container">
-        <h2 id="question-text">Carregando...</h2>
-        <div id="options"></div>
+    <div id="quiz-card">
+        <div class="progress-bar"><div id="progress"></div></div>
+        <div id="quiz-content">
+            <h2 id="question-text">Analizando...</h2>
+            <div id="options"></div>
+        </div>
+        <div id="loading" class="hidden">
+            <h2>Processando Perfil...</h2>
+            <div class="loader"></div>
+            <p>Cruzando dados com tendências de automação 2026.</p>
+        </div>
     </div>
 
-    <div id="loading-result" class="hidden">
-        <h2>Processando seu Diagnóstico...</h2>
-        <div class="loader"></div>
-        <p>Analisando dados de mercado para 2026...</p>
-    </div>
-</div>
+    <script>
+        const questions = [
+            { q: "1. Como é sua rotina de trabalho?", options: [{t:"Repetitiva e baseada em dados/padrões", p:40}, {t:"Híbrida (técnica + social)", p:20}, {t:"Criativa ou Estratégica", p:5}] },
+            { q: "2. Você domina ferramentas de IA?", options: [{t:"Não, ou apenas o básico", p:30}, {t:"Sim, uso moderadamente", p:10}, {t:"Sou avançado, uso diariamente", p:0}] },
+            { q: "3. Sua função exige negociação ou gestão de crises humanas?", options: [{t:"Raramente", p:20}, {t:"Frequentemente", p:5}] },
+            { q: "4. Qual a velocidade de digitalização do seu setor?", options: [{t:"Altíssima (tudo virando software)", p:10}, {t:"Lenta (depende do físico)", p:0}] }
+        ];
 
-<script>
-    const questions = [
-        { q: "Qual o nível de previsibilidade das suas tarefas diárias?", 
-          options: [ {t: "Altíssimo (Sigo processos fixos)", p: 30}, {t: "Moderado (Misturo rotina com decisões)", p: 15}, {t: "Baixo (Cada dia é um desafio novo)", p: 5} ] },
-        { q: "Com que frequência você utiliza IA para gerar textos, códigos ou análises?", 
-          options: [ {t: "Nunca ou raramente", p: 30}, {t: "Uso para tarefas básicas", p: 15}, {t: "Uso avançado/diário", p: 0} ] },
-        { q: "Sua função depende de negociação complexa ou empatia humana?", 
-          options: [ {t: "Não, meu foco é técnico/execução", p: 20}, {t: "Sim, lido com pessoas e conflitos", p: 5} ] },
-        { q: "O quanto sua área de atuação está sendo digitalizada no momento?", 
-          options: [ {t: "Totalmente (Tudo virando app/software)", p: 20}, {t: "Parcialmente", p: 10}, {t: "Pouco (Depende do físico/presencial)", p: 0} ] }
-    ];
+        let current = 0, score = 0;
 
-    let current = 0;
-    let score = 0;
-
-    function renderQuestion() {
-        const q = questions[current];
-        document.getElementById('question-text').innerText = q.q;
-        const optionsDiv = document.getElementById('options');
-        optionsDiv.innerHTML = '';
-        
-        q.options.forEach(opt => {
-            const btn = document.createElement('button');
-            btn.className = 'option';
-            btn.innerText = opt.t;
-            btn.onclick = () => next(opt.p);
-            optionsDiv.appendChild(btn);
-        });
-        document.getElementById('progress').style.width = ((current / questions.length) * 100) + "%";
-    }
-
-    function next(points) {
-        score += points;
-        current++;
-        if (current < questions.length) {
-            renderQuestion();
-        } else {
-            showProcessing();
+        function showQ() {
+            const q = questions[current];
+            document.getElementById('question-text').innerText = q.q;
+            const optDiv = document.getElementById('options');
+            optDiv.innerHTML = '';
+            q.options.forEach(o => {
+                const b = document.createElement('button');
+                b.className = 'option'; b.innerText = o.t;
+                b.onclick = () => { score += o.p; current++; if(current < questions.length) showQ(); else finish(); };
+                optDiv.appendChild(b);
+            });
+            document.getElementById('progress').style.width = (current / questions.length * 100) + "%";
         }
-    }
 
-    function showProcessing() {
-        document.getElementById('question-container').classList.add('hidden');
-        document.getElementById('loading-result').classList.remove('hidden');
-        document.getElementById('progress').style.width = "100%";
-
-        // Simula processamento para dar autoridade e redireciona
-        setTimeout(() => {
-            if (score >= 60) {
-                window.location.href = "resultado-alto.html?score=" + score;
-            } else {
-                window.location.href = "resultado-medio.html?score=" + score;
-            }
-        }, 3000);
-    }
-
-    renderQuestion();
-</script>
+        function finish() {
+            document.getElementById('quiz-content').classList.add('hidden');
+            document.getElementById('loading').classList.remove('hidden');
+            setTimeout(() => {
+                // REDIRECIONAMENTO LÓGICO
+                if(score >= 60) window.location.href = "resultado-alto.html";
+                else window.location.href = "resultado-medio.html";
+            }, 3000);
+        }
+        showQ();
+    </script>
 </body>
 </html>
