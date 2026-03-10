@@ -3,23 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perfil Lab | Diagnóstico de Carreira IA</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Perfil Lab | Diagnóstico 2026</title>
     <style>
-        body { background-color: #0f172a; color: white; font-family: sans-serif; }
-        .gradient-text { background: linear-gradient(90deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        body { font-family: sans-serif; background: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        #quiz-container { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); max-width: 500px; width: 90%; text-align: center; }
+        .hidden { display: none; }
+        button { background: #0078d4; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 16px; margin-top: 20px; }
+        button:hover { background: #005a9e; }
+        .option-btn { display: block; width: 100%; background: #eee; color: #333; margin: 10px 0; text-align: left; }
+        .option-btn:hover { background: #ddd; }
     </style>
 </head>
-<body class="flex flex-col items-center justify-center min-h-screen p-6 text-center">
-    <div class="max-w-2xl">
-        <h1 class="text-4xl md:text-6xl font-bold mb-6">Sua profissão sobrevive à <span class="gradient-text">Inteligência Artificial?</span></h1>
-        <p class="text-lg text-slate-400 mb-8">Descubra seu índice de substituibilidade e receba um roadmap personalizado para dominar as ferramentas de IA do seu setor.</p>
-        
-        <a href="https://tally.so/r/SEU-ID-AQUI" class="bg-sky-500 hover:bg-sky-400 text-white font-bold py-4 px-8 rounded-full text-xl transition-all transform hover:scale-105 shadow-lg shadow-sky-500/20">
-            Começar Diagnóstico Gratuito
-        </a>
-        
-        <p class="mt-8 text-sm text-slate-500">Leva menos de 2 minutos. 100% Seguro.</p>
+<body>
+
+<div id="quiz-container">
+    <div id="start-screen">
+        <h1>Perfil Lab</h1>
+        <p>Descubra seu índice de risco frente à IA em 2026.</p>
+        <button onclick="startQuiz()">Começar Diagnóstico</button>
     </div>
+
+    <div id="question-screen" class="hidden">
+        <h2 id="question-text">Pergunta aqui</h2>
+        <div id="options-container"></div>
+    </div>
+
+    <div id="result-screen" class="hidden">
+        <h2>Seu Resultado</h2>
+        <p id="score-text"></p>
+        <p id="advice-text"></p>
+        <button onclick="location.reload()">Refazer Teste</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { q: "Qual o nível de repetição da sua rotina?", options: [ {t: "Alta (Processos fixos)", p: 40}, {t: "Média (Híbrida)", p: 20}, {t: "Baixa (Estratégica)", p: 5} ] },
+        { q: "Com que frequência você usa IA no trabalho?", options: [ {t: "Nunca", p: 40}, {t: "Às vezes", p: 15}, {t: "Sempre", p: 0} ] }
+    ];
+
+    let currentQuestion = 0;
+    let totalScore = 0;
+
+    function startQuiz() {
+        document.getElementById('start-screen').classList.add('hidden');
+        document.getElementById('question-screen').classList.remove('hidden');
+        showQuestion();
+    }
+
+    function showQuestion() {
+        const q = questions[currentQuestion];
+        document.getElementById('question-text').innerText = q.q;
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+        q.options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.innerText = opt.t;
+            btn.className = 'option-btn';
+            btn.onclick = () => nextQuestion(opt.p);
+            container.appendChild(btn);
+        });
+    }
+
+    function nextQuestion(points) {
+        totalScore += points;
+        currentQuestion++;
+        if (currentQuestion < questions.length) {
+            showQuestion();
+        } else {
+            showResult();
+        }
+    }
+
+    function showResult() {
+        document.getElementById('question-screen').classList.add('hidden');
+        document.getElementById('result-screen').classList.remove('hidden');
+        document.getElementById('score-text').innerText = "Seu Score de Risco: " + totalScore + "%";
+        
+        let advice = "";
+        if (totalScore >= 60) advice = "Risco ALTO: Você precisa de transição urgente.";
+        else if (totalScore >= 30) advice = "Risco MÉDIO: Comece a dominar ferramentas de IA.";
+        else advice = "Risco BAIXO: Continue focando em estratégia humana.";
+        
+        document.getElementById('advice-text').innerText = advice;
+    }
+</script>
+
 </body>
 </html>
