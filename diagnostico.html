@@ -116,18 +116,6 @@
       font-size: 14px;
     }
 
-    .debug-box {
-      margin-top: 12px;
-      padding: 10px;
-      background: #f5f7fa;
-      border: 1px solid #d0d7de;
-      border-radius: 8px;
-      font-size: 12px;
-      color: #333;
-      text-align: left;
-      white-space: pre-wrap;
-    }
-
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
@@ -160,13 +148,12 @@
         <h3>Analisando suas respostas...</h3>
         <p class="small-muted">Gravando seus dados e preparando seu score.</p>
         <div id="sendError" class="error-box hidden"></div>
-        <div id="debugBox" class="debug-box hidden"></div>
       </div>
     </div>
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby8ha4RK3IWQRmgUdkpAYDDNGtvK_Ld8_Y7r7Y5GTd4qBF5Df2Cj_xLrixleu41oo48/exec";
+    const SCRIPT_URL = "COLE_AQUI_A_URL_DO_WEBAPP_DO_APPS_SCRIPT";
     const SCORE_MAXIMO = 80;
 
     let scoreTotal = 0;
@@ -233,12 +220,6 @@
       const box = document.getElementById("sendError");
       box.textContent = "";
       box.classList.add("hidden");
-    }
-
-    function showDebug(message) {
-      const box = document.getElementById("debugBox");
-      box.textContent = message;
-      box.classList.remove("hidden");
     }
 
     function validarEmail(email) {
@@ -334,7 +315,6 @@
       };
 
       localStorage.setItem("perfilab_user", JSON.stringify(payload));
-      showDebug("Payload enviado:\n" + JSON.stringify(payload, null, 2));
 
       try {
         const response = await fetch(SCRIPT_URL, {
@@ -343,10 +323,6 @@
         });
 
         const text = await response.text();
-        showDebug(
-          "Payload enviado:\n" + JSON.stringify(payload, null, 2) +
-          "\n\nResposta bruta do Apps Script:\n" + text
-        );
 
         let result;
         try {
