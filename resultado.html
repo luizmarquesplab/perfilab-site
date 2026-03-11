@@ -1,209 +1,154 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Seu Resultado | Perfil Lab</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Seu Resultado | Perfil Lab</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f2f5;
+      text-align: center;
+      padding: 50px 20px;
+      margin: 0;
+    }
 
-<style>
-body{
-font-family:'Segoe UI',sans-serif;
-background:#f0f2f5;
-text-align:center;
-padding:50px 20px;
-margin:0;
-}
+    .card {
+      background: white;
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 40px;
+      border-radius: 24px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
 
-.card{
-background:white;
-max-width:640px;
-margin:0 auto;
-padding:40px;
-border-radius:24px;
-box-shadow:0 10px 40px rgba(0,0,0,0.1);
-}
+    .score {
+      font-size: 5rem;
+      font-weight: bold;
+      color: #0078d4;
+      margin: 10px 0;
+    }
 
-.score{
-font-size:5rem;
-font-weight:bold;
-color:#0078d4;
-margin:10px 0;
-}
+    .desc {
+      font-size: 1.05rem;
+      color: #444;
+      line-height: 1.6;
+      text-align: left;
+      background: #f9f9f9;
+      padding: 20px;
+      border-radius: 12px;
+      margin-top: 25px;
+    }
 
-.desc{
-font-size:1.05rem;
-color:#444;
-line-height:1.6;
-text-align:left;
-background:#f9f9f9;
-padding:20px;
-border-radius:12px;
-margin-top:25px;
-}
+    .btn-pay {
+      display: block;
+      background: #0078d4;
+      color: white;
+      padding: 20px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-top: 30px;
+      transition: 0.3s;
+    }
 
-.btn-pay{
-display:block;
-background:#0078d4;
-color:white;
-padding:20px;
-border-radius:12px;
-text-decoration:none;
-font-weight:bold;
-font-size:1.1rem;
-margin-top:30px;
-transition:0.3s;
-}
+    .btn-pay:hover {
+      background: #005fa3;
+      transform: scale(1.02);
+    }
 
-.btn-pay:hover{
-background:#005fa3;
-transform:scale(1.02);
-}
+    .muted {
+      font-size: 0.85rem;
+      color: #888;
+      margin-top: 14px;
+    }
 
-.bar-wrap{
-width:100%;
-height:14px;
-background:#e8edf2;
-border-radius:999px;
-overflow:hidden;
-margin:18px 0 8px 0;
-}
+    .bar-wrap {
+      width: 100%;
+      height: 14px;
+      background: #e8edf2;
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 18px 0 8px 0;
+    }
 
-.bar-fill{
-height:100%;
-background:linear-gradient(90deg,#0078d4,#38a3ff);
-width:0%;
-transition:width 0.6s ease;
-}
-
-.muted{
-font-size:0.85rem;
-color:#888;
-margin-top:14px;
-}
-</style>
+    .bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #0078d4, #38a3ff);
+      width: 0%;
+      transition: width 0.6s ease;
+    }
+  </style>
 </head>
-
 <body>
+  <div id="main" class="card" style="display:none;">
+    <h1 style="margin-bottom:0;">Análise de <span id="userName"></span></h1>
+    <p style="color:#666;">Seu risco de substituição por IA em 2026 é:</p>
 
-<div id="main" class="card" style="display:none;">
+    <div class="score"><span id="userScore"></span>%</div>
 
-<h1>Análise de <span id="userName"></span></h1>
+    <div class="bar-wrap">
+      <div id="scoreBar" class="bar-fill"></div>
+    </div>
 
-<p style="color:#666;">
-Seu risco de substituição por IA em 2026 é:
-</p>
+    <div class="desc" id="userDesc"></div>
 
-<div class="score">
-<span id="userScore"></span>%
-</div>
+    <a href="#" id="payLink" class="btn-pay" target="_blank" rel="noopener noreferrer">
+      LIBERAR RELATÓRIO PERSONALIZADO
+    </a>
 
-<div class="bar-wrap">
-<div id="scoreBar" class="bar-fill"></div>
-</div>
+    <p class="muted">✓ Resultado calculado com base nas respostas do seu diagnóstico.</p>
+  </div>
 
-<div id="userDesc" class="desc"></div>
+  <script>
+    function montarLinkPagamento(baseUrl, data) {
+      const url = new URL(baseUrl);
 
-<a href="#" id="payLink" class="btn-pay">
-LIBERAR RELATÓRIO PERSONALIZADO
-</a>
+      url.searchParams.set("locked_prefilled_email", data.email || "");
+      url.searchParams.set("client_reference_id", String(data.timestamp || ""));
+      url.searchParams.set("utm_source", "perfil_lab");
+      url.searchParams.set("utm_medium", "diagnostico");
+      url.searchParams.set("utm_campaign", data.product_type || "");
 
-<p class="muted">
-✓ Resultado calculado com base nas respostas do seu diagnóstico.
-</p>
+      return url.toString();
+    }
 
-</div>
+    const d = JSON.parse(localStorage.getItem("perfilab_user") || "null");
 
+    if (!d || !d.nome || d.score_percentual === undefined || d.score_percentual === null) {
+      window.location.href = "index.html";
+    } else {
+      document.getElementById("main").style.display = "block";
 
-<script>
+      const nome = d.nome;
+      const score = Number(d.score_percentual || 0);
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby8ha4RK3IWQRmgUdkpAYDDNGtvK_Ld8_Y7r7Y5GTd4qBF5Df2Cj_xLrixleu41oo48/exec";
+      document.getElementById("userName").innerText = nome;
+      document.getElementById("userScore").innerText = score;
+      document.getElementById("scoreBar").style.width = score + "%";
 
+      const desc = document.getElementById("userDesc");
+      const link = document.getElementById("payLink");
 
-const d = JSON.parse(localStorage.getItem("perfilab_user") || "null");
+      if (score >= 70) {
+        desc.innerHTML =
+          "<strong>CRÍTICO:</strong> Seu perfil está mais exposto a atividades repetitivas, operacionais ou passíveis de automação. O relatório detalhado mostrará os principais vetores de risco, caminhos de reposicionamento e prioridades de adaptação para 2026.";
+      } else if (score >= 40) {
+        desc.innerHTML =
+          "<strong>MODERADO:</strong> Seu perfil está em uma zona intermediária. Há espaço relevante para fortalecimento, aumento de produtividade e diferenciação profissional. O relatório detalhado mostrará onde você pode ganhar vantagem prática no curto prazo.";
+      } else {
+        desc.innerHTML =
+          "<strong>ELITE:</strong> Seu perfil concentra competências mais humanas, analíticas ou estratégicas, menos vulneráveis à substituição direta. O relatório detalhado mostrará como ampliar esse posicionamento e capturar valor com IA, em vez de competir com ela.";
+      }
 
-if(!d || !d.nome){
-window.location.href="index.html";
-}
-
-document.getElementById("main").style.display="block";
-
-const nome = d.nome;
-const score = Number(d.score_percentual || 0);
-
-document.getElementById("userName").innerText = nome;
-document.getElementById("userScore").innerText = score;
-document.getElementById("scoreBar").style.width = score + "%";
-
-
-const desc = document.getElementById("userDesc");
-
-if(score >= 70){
-
-desc.innerHTML =
-"<strong>CRÍTICO:</strong> Seu perfil está mais exposto a atividades repetitivas, operacionais ou passíveis de automação. O relatório detalhado mostrará os principais vetores de risco, caminhos de reposicionamento e prioridades de adaptação para 2026.";
-
-}
-else if(score >= 40){
-
-desc.innerHTML =
-"<strong>MODERADO:</strong> Seu perfil está em uma zona intermediária. Há espaço relevante para fortalecimento, aumento de produtividade e diferenciação profissional. O relatório detalhado mostrará onde você pode ganhar vantagem prática no curto prazo.";
-
-}
-else{
-
-desc.innerHTML =
-"<strong>ELITE:</strong> Seu perfil concentra competências mais humanas, analíticas ou estratégicas, menos vulneráveis à substituição direta. O relatório detalhado mostrará como ampliar esse posicionamento e capturar valor com IA.";
-
-}
-
-
-
-async function iniciarCheckout(){
-
-try{
-
-const response = await fetch(SCRIPT_URL,{
-method:"POST",
-body:JSON.stringify({
-action:"create_checkout_session",
-nome:d.nome,
-email:d.email,
-product_type:d.product_type,
-score_percentual:d.score_percentual,
-timestamp:String(d.timestamp || "")
-})
-});
-
-const text = await response.text();
-const result = JSON.parse(text);
-
-if(!result.ok || !result.checkout_url){
-throw new Error(result.message || "Falha ao criar checkout.");
-}
-
-window.location.href = result.checkout_url;
-
-}
-catch(err){
-
-alert("Erro ao iniciar pagamento: " + err.message);
-
-}
-
-}
-
-
-
-document.getElementById("payLink").addEventListener("click",function(e){
-
-e.preventDefault();
-
-iniciarCheckout();
-
-});
-
-
-</script>
-
+      if (d.payment_link) {
+        link.href = montarLinkPagamento(d.payment_link, d);
+      } else {
+        link.href = "#";
+        link.innerText = "LINK DE PAGAMENTO INDISPONÍVEL";
+      }
+    }
+  </script>
 </body>
 </html>
