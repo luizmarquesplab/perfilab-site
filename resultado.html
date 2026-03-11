@@ -185,7 +185,7 @@ body{
     function montarLinkPagamento(baseUrl, data) {
       const url = new URL(baseUrl);
 
-      url.searchParams.set("locked_prefilled_email", data.email || "");
+      url.searchParams.set("prefilled_email", data.email || "");
       url.searchParams.set("client_reference_id", String(data.timestamp || ""));
       url.searchParams.set("utm_source", "perfil_lab");
       url.searchParams.set("utm_medium", "diagnostico");
