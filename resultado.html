@@ -94,64 +94,46 @@
 
     <div class="desc" id="userDesc"></div>
 
-    <a href="#" id="payLink" class="btn-pay" target="_blank" rel="noopener noreferrer">
-      LIBERAR RELATÓRIO PERSONALIZADO
+    <a href="#" id="payLink" class="btn-pay">
+    LIBERAR RELATÓRIO PERSONALIZADO
     </a>
 
     <p class="muted">✓ Resultado calculado com base nas respostas do seu diagnóstico.</p>
   </div>
 
   <script>
-    function montarLinkStripe(baseUrl, data) {
-      const url = new URL(baseUrl);
 
-      url.searchParams.set("prefilled_email", data.email || "");
-      url.searchParams.set("client_reference_id", String(data.timestamp || ""));
-      url.searchParams.set("utm_source", "perfil_lab");
-      url.searchParams.set("utm_medium", "diagnostico");
-      url.searchParams.set("utm_campaign", data.product_type || "");
-      url.searchParams.set("prefill_nome", data.nome || "");
-      url.searchParams.set("prefill_score", data.score_percentual || "");
-      url.searchParams.set("prefill_product_type", data.product_type || "");
+async function iniciarCheckout() {
+  const d = JSON.parse(localStorage.getItem("perfilab_user") || "null");
+  if (!d) return;
 
-      return url.toString();
-    }
+  const response = await fetch("SUA_URL_DO_APPS_SCRIPT_EXEC", {
+    method: "POST",
+    body: JSON.stringify({
+      action: "create_checkout_session",
+      nome: d.nome,
+      email: d.email,
+      product_type: d.product_type,
+      score_percentual: d.score_percentual,
+      timestamp: String(d.timestamp || "")
+    })
+  });
 
-    const d = JSON.parse(localStorage.getItem("perfilab_user") || "null");
+  const text = await response.text();
+  const result = JSON.parse(text);
 
-    if (!d || !d.nome || d.score_percentual === undefined || d.score_percentual === null) {
-      window.location.href = "index.html";
-    } else {
-      document.getElementById("main").style.display = "block";
+  if (!result.ok || !result.checkout_url) {
+    throw new Error(result.message || "Falha ao criar checkout.");
+  }
 
-      const nome = d.nome;
-      const score = Number(d.score_percentual || 0);
+  window.location.href = result.checkout_url;
+}
 
-      document.getElementById("userName").innerText = nome;
-      document.getElementById("userScore").innerText = score;
-      document.getElementById("scoreBar").style.width = score + "%";
-
-      const desc = document.getElementById("userDesc");
-      const link = document.getElementById("payLink");
-
-      if (score >= 70) {
-        desc.innerHTML =
-          "<strong>CRÍTICO:</strong> Seu perfil está mais exposto a atividades repetitivas, operacionais ou passíveis de automação. O relatório detalhado mostrará os principais vetores de risco, caminhos de reposicionamento e prioridades de adaptação para 2026.";
-      } else if (score >= 40) {
-        desc.innerHTML =
-          "<strong>MODERADO:</strong> Seu perfil está em uma zona intermediária. Há espaço relevante para fortalecimento, aumento de produtividade e diferenciação profissional. O relatório detalhado mostrará onde você pode ganhar vantagem prática no curto prazo.";
-      } else {
-        desc.innerHTML =
-          "<strong>ELITE:</strong> Seu perfil concentra competências mais humanas, analíticas ou estratégicas, menos vulneráveis à substituição direta. O relatório detalhado mostrará como ampliar esse posicionamento e capturar valor com IA, em vez de competir com ela.";
-      }
-
-      if (d.payment_link) {
-        link.href = montarLinkStripe(d.payment_link, d);
-      } else {
-        link.href = "#";
-        link.innerText = "LINK DE PAGAMENTO INDISPONÍVEL";
-      }
-    }
-  </script>
-</body>
-</html>
+document.getElementById("payLink").addEventListener("click", async function(e) {
+  e.preventDefault();
+  try {
+    await iniciarCheckout();
+  } catch (err) {
+    alert("Erro ao iniciar pagamento: " + err.message);
+  }
+});
