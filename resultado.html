@@ -94,12 +94,29 @@
 
     <div class="desc" id="userDesc"></div>
 
-    <a href="#" id="payLink" class="btn-pay">LIBERAR RELATÓRIO PERSONALIZADO</a>
+    <a href="#" id="payLink" class="btn-pay" target="_blank" rel="noopener noreferrer">
+      LIBERAR RELATÓRIO PERSONALIZADO
+    </a>
 
     <p class="muted">✓ Resultado calculado com base nas respostas do seu diagnóstico.</p>
   </div>
 
   <script>
+    function montarLinkStripe(baseUrl, data) {
+      const url = new URL(baseUrl);
+
+      url.searchParams.set("prefilled_email", data.email || "");
+      url.searchParams.set("client_reference_id", data.timestamp || "");
+      url.searchParams.set("utm_source", "perfil_lab");
+      url.searchParams.set("utm_medium", "diagnostico");
+      url.searchParams.set("utm_campaign", data.product_type || "");
+      url.searchParams.set("prefill_nome", data.nome || "");
+      url.searchParams.set("prefill_score", data.score_percentual || "");
+      url.searchParams.set("prefill_product_type", data.product_type || "");
+
+      return url.toString();
+    }
+
     const d = JSON.parse(localStorage.getItem("perfilab_user") || "null");
 
     if (!d || !d.nome || d.score_percentual === undefined || d.score_percentual === null) {
@@ -129,7 +146,7 @@
       }
 
       if (d.payment_link) {
-        link.href = d.payment_link;
+        link.href = montarLinkStripe(d.payment_link, d);
       } else {
         link.href = "#";
         link.innerText = "LINK DE PAGAMENTO INDISPONÍVEL";
