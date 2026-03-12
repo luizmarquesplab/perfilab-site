@@ -180,10 +180,6 @@ body{
 
     <p class="muted">✓ Resultado calculado com base nas respostas do seu diagnóstico.</p>
   </div>
-    <a href="#" id="payLinkStripe" class="btn-pay">PAGAR COM CARTÃO</a>
-    <a href="#" id="payLinkPagBank" class="btn-pay" style="margin-top:14px; background:#00a650;">
-    PAGAR COM PIX / PAGBANK
-    </a>
   
   <script>
     function montarLinkPagamento(baseUrl, data) {
@@ -233,41 +229,7 @@ body{
         link.innerText = "LINK DE PAGAMENTO INDISPONÍVEL";
       }
     }
-    async function iniciarCheckoutPagBank() {
-  const d = JSON.parse(localStorage.getItem("perfilab_user") || "null");
-  if (!d) return;
 
-  const response = await fetch("SUA_URL_DO_APPS_SCRIPT_EXEC", {
-    method: "POST",
-    body: JSON.stringify({
-      action: "create_pagbank_checkout",
-      nome: d.nome,
-      email: d.email,
-      whatsapp: d.whatsapp || "",
-      product_type: d.product_type,
-      score_percentual: d.score_percentual,
-      timestamp: String(d.timestamp || "")
-    })
-  });
-
-  const text = await response.text();
-  const result = JSON.parse(text);
-
-  if (!result.ok || !result.checkout_url) {
-    throw new Error(result.message || "Falha ao criar checkout PagBank.");
-  }
-
-  window.location.href = result.checkout_url;
-}
-
-document.getElementById("payLinkPagBank").addEventListener("click", async function(e) {
-  e.preventDefault();
-  try {
-    await iniciarCheckoutPagBank();
-  } catch (err) {
-    alert("Erro ao iniciar checkout PagBank: " + err.message);
-  }
-});
   </script>
 </body>
 </html>
