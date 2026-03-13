@@ -784,8 +784,8 @@ function calcularScore(answers) {
 
     function showLeadScreen() {
       const scoreBruto = answers.reduce((s, a) => s + (a ? Number(a.p) : 0), 0);
-      //const scorePct = Math.round((scoreBruto / SCORE_MAXIMO) * 100);
-      const scorePct = Math.round( (pontos_brutos - MIN_PONTOS_BRUTOS) / (MAX_PONTOS_BRUTOS - MIN_PONTOS_BRUTOS) * SCORE_MAXIMO);
+      const scorePct = Math.round((scoreBruto / SCORE_MAXIMO) * 100);
+      //const scorePct = Math.round( (pontos_brutos - MIN_PONTOS_BRUTOS) / (MAX_PONTOS_BRUTOS - MIN_PONTOS_BRUTOS) * SCORE_MAXIMO);
 
       document.getElementById('teaserScore').textContent = scorePct + '%';
 
