@@ -638,28 +638,36 @@ const MIN_PONTOS_BRUTOS = 40;      // soma das menores opções (opcional, mas �
 // DADOS DO QUESTIONÁRIO
 // =============================================
 const questions = [
-      { q: "Sua rotina envolve muitas tarefas repetitivas?", cat: "Sobre o seu trabalho",
-        opt: [{ t: "Sim, a maior parte do tempo.", p: 20 }, { t: "Não, meu trabalho é imprevisível.", p: 5 }] },
-      { q: "Você já utiliza ferramentas de IA no seu dia a dia?", cat: "Adoção de tecnologia",
-        opt: [{ t: "Ainda não ou muito pouco.", p: 15 }, { t: "Sim, sou usuário frequente.", p: 0 }] },
-      { q: "Qual sua principal área de atuação?", cat: "Perfil profissional",
-        opt: [{ t: "Administrativa, Dados ou Técnica", p: 15 }, { t: "Saúde, Educação ou Criativa", p: 5 }] },
-      { q: "Seu trabalho exige negociações ou empatia humana complexa?", cat: "Habilidades humanas",
-        opt: [{ t: "Raramente ou nunca.", p: 15 }, { t: "O tempo todo — é central.", p: 0 }] },
-      { q: "Sua empresa está planejando automações em 2026?", cat: "Contexto da empresa",
-        opt: [{ t: "Sim, já ouvi falar.", p: 15 }, { t: "Não ou não sei.", p: 5 }] },
-      { q: "Quanto do seu dia é gasto em processos que seguem um padrão fixo?", cat: "Estrutura do trabalho",
-        opt: [{ t: "Mais de 70% - Rotina bem definida.", p: 25 }, { t: "Menos de 30% — muito imprevisível.", p: 5 }] },
-      { q: "Na sua função, o que é mais decisivo?", cat: "Natureza das decisões",
-        opt: [{ t: "Perícia, precisão técnica e/ou análise de dados", p: 20 }, { t: "Gestão de pessoas e conflitos", p: 5 }] },
-      { q: "Como você atualiza suas competências profissionais hoje?", cat: "Desenvolvimento contínuo",
-        opt: [{ t: "Quase não atualizo ou faço raramente.", p: 20 }, { t: "Atualizo de forma constante e intencional.", p: 5 }] },
-      { q: "Se uma IA fizesse 50% do seu trabalho operacional, o que você faria com o tempo?", cat: "Adaptabilidade",
-        opt: [{ t: "Teria dificuldade para redefinir meu papel.", p: 20 }, { t: "Usaria para análise, melhoria e liderança.", p: 5 }] },
-      { q: "Qual o nível de complexidade das decisões que você toma sozinho?", cat: "Complexidade decisória",
-        opt: [{ t: "Decisões operacionais e de baixa complexidade.", p: 20 }, { t: "Decisões complexas, com julgamento e impacto.", p: 5 }] }
-    ];
-
+  { q: "Sua rotina envolve muitas tarefas repetitivas?", cat: "Sobre o seu trabalho",
+    opt: [{ t: "Sim, a maior parte do tempo.", p: 10 }, { t: "Não, meu trabalho é imprevisível.", p: 2 }] },
+  
+  { q: "Você já utiliza ferramentas de IA no seu dia a dia?", cat: "Adoção de tecnologia",
+    opt: [{ t: "Ainda não ou muito pouco.", p: 10 }, { t: "Sim, sou usuário frequente.", p: 0 }] },
+  
+  { q: "Qual sua principal área de atuação?", cat: "Perfil profissional",
+    opt: [{ t: "Administrativa, Dados ou Técnica", p: 10 }, { t: "Saúde, Educação ou Criativa", p: 3 }] },
+  
+  { q: "Seu trabalho exige negociações ou empatia humana complexa?", cat: "Habilidades humanas",
+    opt: [{ t: "Raramente ou nunca.", p: 10 }, { t: "O tempo todo — é central.", p: 0 }] },
+  
+  { q: "Sua empresa está planejando automações em 2026?", cat: "Contexto da empresa",
+    opt: [{ t: "Sim, já ouvi falar.", p: 10 }, { t: "Não ou não sei.", p: 2 }] },
+  
+  { q: "Quanto do seu dia é gasto em processos que seguem um padrão fixo?", cat: "Estrutura do trabalho",
+    opt: [{ t: "Mais de 70% - Rotina bem definida.", p: 10 }, { t: "Menos de 30% — muito imprevisível.", p: 2 }] },
+  
+  { q: "Na sua função, o que é mais decisivo?", cat: "Natureza das decisões",
+    opt: [{ t: "Perícia, precisão técnica e/ou análise de dados", p: 10 }, { t: "Gestão de pessoas e conflitos", p: 0 }] },
+  
+  { q: "Como você atualiza suas competências profissionais hoje?", cat: "Desenvolvimento contínuo",
+    opt: [{ t: "Quase não atualizo ou faço raramente.", p: 10 }, { t: "Atualizo de forma constante e intencional.", p: 2 }] },
+  
+  { q: "Se uma IA fizesse 50% do seu trabalho operacional, o que você faria com o tempo?", cat: "Adaptabilidade",
+    opt: [{ t: "Teria dificuldade para redefinir meu papel.", p: 10 }, { t: "Usaria para análise, melhoria e liderança.", p: 0 }] },
+  
+  { q: "Qual o nível de complexidade das decisões que você toma sozinho?", cat: "Complexidade decisória",
+    opt: [{ t: "Decisões operacionais e de baixa complexidade.", p: 10 }, { t: "Decisões complexas, com julgamento e impacto.", p: 2 }] }
+];
 // =============================================
 // FUNÇÕES DE CÁLCULO
 // =============================================
