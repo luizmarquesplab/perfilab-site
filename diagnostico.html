@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Diagnóstico | Perfil Lab</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       font-family: Arial, sans-serif;
       background: #f4f7f6;
@@ -14,7 +18,6 @@
       min-height: 100vh;
       margin: 0;
       padding: 20px;
-      box-sizing: border-box;
     }
 
     #quiz-card {
@@ -22,9 +25,8 @@
       padding: 32px;
       border-radius: 16px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-      max-width: 560px;
+      max-width: 620px;
       width: 100%;
-      box-sizing: border-box;
     }
 
     .hidden {
@@ -37,7 +39,6 @@
       margin: 10px 0;
       border: 1px solid #ddd;
       border-radius: 8px;
-      box-sizing: border-box;
       font-size: 16px;
     }
 
@@ -64,6 +65,7 @@
       color: #222;
       border: 2px solid #eaeaea;
       text-align: left;
+      font-weight: normal;
     }
 
     .option:hover {
@@ -116,9 +118,45 @@
       font-size: 14px;
     }
 
+    .quiz-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .btn-secondary {
+      background: #eef3f8;
+      color: #234;
+      border: 1px solid #d7e2ec;
+    }
+
+    .btn-secondary:hover {
+      background: #e5edf5;
+    }
+
+    .quiz-meta {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 14px;
+      }
+
+      #quiz-card {
+        padding: 22px 16px;
+      }
+
+      .quiz-actions {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
@@ -126,7 +164,9 @@
   <div id="quiz-card">
     <div id="step-lead">
       <h2>Inicie seu Diagnóstico</h2>
-      <p>Preencha para calcular seu risco de substituição pela IA.</p>
+      <p>
+        Responda às perguntas para calcular seu risco de substituição pela IA e receber um diagnóstico personalizado para 2026.
+      </p>
 
       <input type="text" id="name" placeholder="Seu nome completo" />
       <input type="email" id="email" placeholder="Seu melhor e-mail" />
@@ -138,8 +178,13 @@
 
     <div id="step-quiz" class="hidden">
       <div class="progress"><div id="bar"></div></div>
-      <h3 id="q-text" style="min-height: 60px;"></h3>
+      <div class="quiz-meta" id="quizMeta"></div>
+      <h3 id="q-text" style="min-height: 72px;"></h3>
       <div id="options"></div>
+
+      <div class="quiz-actions">
+        <button id="backBtn" type="button" class="btn-secondary">← Voltar</button>
+      </div>
     </div>
 
     <div id="step-loading" class="hidden">
@@ -154,85 +199,83 @@
 
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby8ha4RK3IWQRmgUdkpAYDDNGtvK_Ld8_Y7r7Y5GTd4qBF5Df2Cj_xLrixleu41oo48/exec";
-    const SCORE_MAXIMO = 100;
+    const SCORE_MAXIMO = 125;
 
-    let scoreTotal = 0;
     let current = 0;
     let leadData = null;
+    let answers = [];
 
     const questions = [
-  {
-    q: "1. Quanto do seu trabalho segue processos previsíveis e repetitivos?",
-    opt: [
-      { t: "Mais de 80%", p: 18 },
-      { t: "Entre 50% e 80%", p: 13 },
-      { t: "Entre 20% e 50%", p: 8 },
-      { t: "Menos de 20%", p: 3 }
-    ]
-  },
-  {
-    q: "2. Você já utiliza ferramentas de IA no dia a dia?",
-    opt: [
-      { t: "Ainda não ou quase nunca", p: 10 },
-      { t: "Uso ocasionalmente", p: 7 },
-      { t: "Uso com frequência", p: 3 },
-      { t: "A IA já faz parte da minha rotina", p: 0 }
-    ]
-  },
-  {
-    q: "3. Sua empresa está planejando automações em 2026?",
-    opt: [
-      { t: "Sim, claramente", p: 10 },
-      { t: "Há sinais de que sim", p: 7 },
-      { t: "Não sei dizer", p: 4 },
-      { t: "Não", p: 1 }
-    ]
-  },
-  {
-    q: "4. O que é mais decisivo na sua função hoje?",
-    opt: [
-      { t: "Execução técnica e precisão operacional", p: 14 },
-      { t: "Análise técnica com alguma interação humana", p: 10 },
-      { t: "Coordenação, influência e alinhamento", p: 5 },
-      { t: "Estratégia, liderança e decisão", p: 2 }
-    ]
-  },
-  {
-    q: "5. Como você atualiza suas competências profissionais hoje?",
-    opt: [
-      { t: "Quase não atualizo", p: 12 },
-      { t: "Só quando o mercado exige", p: 9 },
-      { t: "Faço cursos ocasionalmente", p: 5 },
-      { t: "Tenho rotina contínua de aprendizado", p: 1 }
-    ]
-  },
-  {
-    q: "6. Se uma IA fizesse 50% do seu trabalho operacional hoje, o que você faria com o tempo livre?",
-    opt: [
-      { t: "Continuaria focado em tarefas operacionais", p: 12 },
-      { t: "Ajudaria a revisar e supervisionar entregas", p: 8 },
-      { t: "Investiria mais em análise e tomada de decisão", p: 4 },
-      { t: "Criaria novas soluções, projetos ou estratégias", p: 1 }
-    ]
-  },
-  {
-    q: "7. Qual o nível de complexidade das decisões que você toma sozinho?",
-    opt: [
-      { t: "Executo decisões definidas por outros", p: 14 },
-      { t: "Tomo decisões operacionais do dia a dia", p: 10 },
-      { t: "Tomo decisões táticas com impacto relevante", p: 5 },
-      { t: "Tomo decisões estratégicas", p: 1 }
-    ]
-  },
-  {
-    q: "8. Seu trabalho exige negociações, julgamento crítico ou empatia humana complexa?",
-    opt: [
-      { t: "Raramente", p: 10 },
-      { t: "Às vezes", p: 7 },
-      { t: "Com frequência", p: 3 },
-      { t: "O tempo todo", p: 0 }
-    ]
-  } 
+      {
+        q: "1. Sua rotina envolve muitas tarefas repetitivas?",
+        opt: [
+          { t: "Sim, a maior parte do tempo.", p: 20 },
+          { t: "Não, meu trabalho é imprevisível.", p: 5 }
+        ]
+      },
+      {
+        q: "2. Você já utiliza ferramentas de IA no dia a dia?",
+        opt: [
+          { t: "Ainda não ou muito pouco.", p: 15 },
+          { t: "Sim, sou usuário frequente.", p: 0 }
+        ]
+      },
+      {
+        q: "3. Qual sua principal área de atuação?",
+        opt: [
+          { t: "Administrativa, Dados ou Técnica", p: 15 },
+          { t: "Saúde, Educação ou Criativa", p: 5 }
+        ]
+      },
+      {
+        q: "4. Seu trabalho exige negociações ou empatia humana complexa?",
+        opt: [
+          { t: "Raramente.", p: 15 },
+          { t: "O tempo todo.", p: 0 }
+        ]
+      },
+      {
+        q: "5. Sua empresa está planejando automações em 2026?",
+        opt: [
+          { t: "Sim, já ouvi falar.", p: 15 },
+          { t: "Não ou não sei.", p: 5 }
+        ]
+      },
+      {
+        q: "6. Quanto do seu dia é gasto em processos que seguem um padrão fixo?",
+        opt: [
+          { t: "Mais de 70% (Rotina fixa)", p: 25 },
+          { t: "Menos de 30% (Imprevisível)", p: 5 }
+        ]
+      },
+      {
+        q: "7. Na sua função, o que é mais decisivo: precisão técnica ou gestão de pessoas/conflitos?",
+        opt: [
+          { t: "Precisão técnica e dados", p: 20 },
+          { t: "Gestão de pessoas e conflitos", p: 5 }
+        ]
+      },
+      {
+        q: "8. Como você atualiza suas competências profissionais hoje?",
+        opt: [
+          { t: "Quase não atualizo ou faço isso de forma muito esporádica.", p: 20 },
+          { t: "Atualizo de forma constante e intencional.", p: 5 }
+        ]
+      },
+      {
+        q: "9. Se uma IA fizesse 50% do seu trabalho operacional hoje, o que você faria com o tempo livre?",
+        opt: [
+          { t: "Teria dificuldade para redefinir meu papel.", p: 20 },
+          { t: "Usaria o tempo para análise, melhoria e liderança.", p: 5 }
+        ]
+      },
+      {
+        q: "10. Qual o nível de complexidade das decisões que você toma sozinho?",
+        opt: [
+          { t: "Decisões operacionais e de baixa complexidade.", p: 20 },
+          { t: "Decisões complexas, com julgamento e impacto.", p: 5 }
+        ]
+      }
     ];
 
     function showLeadError(message) {
@@ -267,25 +310,44 @@
       return telefone.replace(/\D/g, "");
     }
 
-   function calcularScorePercentual(scoreBruto) {
-        return scoreBruto;
-      }
+    function calcularScoreBruto() {
+      return answers.reduce((total, answer) => total + (answer ? Number(answer.p || 0) : 0), 0);
+    }
+
+    function calcularScorePercentual(scoreBruto) {
+      return Math.round((scoreBruto / SCORE_MAXIMO) * 100);
+    }
+
+    function updateBackButton() {
+      const backBtn = document.getElementById("backBtn");
+      backBtn.disabled = current === 0;
+    }
 
     function showQuestion() {
       const q = questions[current];
       document.getElementById("q-text").innerText = q.q;
+      document.getElementById("quizMeta").innerText = `Pergunta ${current + 1} de ${questions.length}`;
 
       const optionsDiv = document.getElementById("options");
       optionsDiv.innerHTML = "";
 
-      q.opt.forEach(function(option) {
+      q.opt.forEach(function(option, index) {
         const button = document.createElement("button");
         button.type = "button";
         button.className = "option";
         button.textContent = option.t;
 
+        if (answers[current] && answers[current].t === option.t && answers[current].p === option.p) {
+          button.style.borderColor = "#0078d4";
+          button.style.background = "#f3f8ff";
+        }
+
         button.addEventListener("click", function() {
-          scoreTotal += option.p;
+          answers[current] = {
+            t: option.t,
+            p: option.p
+          };
+
           current++;
 
           if (current < questions.length) {
@@ -298,7 +360,14 @@
         optionsDiv.appendChild(button);
       });
 
-      document.getElementById("bar").style.width = ((current / questions.length) * 100) + "%";
+      document.getElementById("bar").style.width = (((current) / questions.length) * 100) + "%";
+      updateBackButton();
+    }
+
+    function goBackQuestion() {
+      if (current === 0) return;
+      current--;
+      showQuestion();
     }
 
     function startQuiz() {
@@ -329,6 +398,9 @@
         whatsapp: phone
       };
 
+      answers = [];
+      current = 0;
+
       document.getElementById("step-lead").classList.add("hidden");
       document.getElementById("step-quiz").classList.remove("hidden");
 
@@ -340,15 +412,23 @@
       document.getElementById("step-loading").classList.remove("hidden");
       hideSendError();
 
+      const scoreBruto = calcularScoreBruto();
+      const scorePercentual = calcularScorePercentual(scoreBruto);
+
       const payload = {
         action: "lead_capture",
         nome: leadData.nome,
         email: leadData.email,
         whatsapp: leadData.whatsapp,
-        score_bruto: scoreTotal,
-        score_percentual: calcularScorePercentual(scoreTotal),
+        score_bruto: scoreBruto,
+        score_percentual: scorePercentual,
         timestamp: Date.now(),
-        origem: "diagnostico_html"
+        origem: "diagnostico_html",
+        respostas: answers.map((answer, index) => ({
+          pergunta: questions[index].q,
+          resposta: answer ? answer.t : "",
+          pontuacao: answer ? answer.p : 0
+        }))
       };
 
       localStorage.setItem("perfilab_user", JSON.stringify(payload));
@@ -386,6 +466,7 @@
 
     document.addEventListener("DOMContentLoaded", function() {
       document.getElementById("startBtn").addEventListener("click", startQuiz);
+      document.getElementById("backBtn").addEventListener("click", goBackQuestion);
     });
   </script>
 </body>
