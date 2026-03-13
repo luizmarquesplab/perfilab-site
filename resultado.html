@@ -4,232 +4,538 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Seu Resultado | Perfil Lab</title>
-<style>
-  * {
-    box-sizing: border-box;
-  }
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blue: #2563eb;
+      --blue-light: #60a5fa;
+      --bg: #06060f;
+      --surface: #0e0e1c;
+      --border: rgba(255,255,255,0.08);
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+    }
 
-body{
-  font-family:'Segoe UI',sans-serif;
-  background:#f0f2f5;
-  margin:0;
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  min-height:100vh;
-  padding:18px;
-}
-
-.card{
-  background:white;
-  width:100%;
-  max-width:620px;
-
-  padding:32px 24px;
-  border-radius:24px;
-
-  box-shadow:0 10px 40px rgba(0,0,0,0.1);
-
-  text-align:center;
-}
-
- .score{
-  font-size:4.8rem;
-  font-weight:bold;
-  color:#0078d4;
-  margin:10px 0;
-}
-
-.desc{
-  font-size:1.1rem;
-  color:#444;
-  line-height:1.7;
-  text-align:justify;
-  text-justify:inter-word;
-
-  background:#f9f9f9;
-  padding:20px;
-  border-radius:12px;
-  margin-top:24px;
-}
-
-  .btn-pay {
-    display: block;
-    background: #0078d4;
-    color: white;
-    padding: 18px;
-    border-radius: 12px;
-    text-decoration: none;
-    font-weight: bold;
-    font-size: 1rem;
-    margin-top: 30px;
-    transition: 0.3s;
-  }
-
-  .btn-pay:hover {
-    background: #005fa3;
-    transform: scale(1.02);
-  }
-
-  .muted {
-    font-size: 0.82rem;
-    color: #888;
-    margin-top: 14px;
-  }
-
-  .bar-wrap {
-    width: 100%;
-    height: 14px;
-    background: #e8edf2;
-    border-radius: 999px;
-    overflow: hidden;
-    margin: 18px 0 8px 0;
-  }
-
-  .bar-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #0078d4, #38a3ff);
-    width: 0%;
-    transition: width 0.6s ease;
-  }
-
-  @media (max-width: 768px) {
     body {
-      padding: 14px 10px;
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 0 0 60px;
+      overflow-x: hidden;
     }
 
-    .card {
-      max-width: 100%;
-      padding: 22px 16px;
-      border-radius: 18px;
+    body::before {
+      content: '';
+      position: fixed;
+      top: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, var(--risk-glow, rgba(37,99,235,0.15)) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+      transition: background 0.6s ease;
     }
 
-    h1{
-  font-size:1.9rem;
-  margin-bottom:10px;
-}
+    #main {
+      display: none;
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 0 20px;
+      position: relative;
+      z-index: 1;
+    }
 
-    .score {
+    /* TOP BAR */
+    .top-bar {
+      padding: 18px 0 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 32px;
+    }
+
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--blue-light);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .result-badge {
+      font-size: 0.72rem;
+      color: var(--muted);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 100px;
+    }
+
+    /* SCORE SECTION */
+    .score-section {
+      text-align: center;
+      margin-bottom: 32px;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.2s ease forwards;
+    }
+
+    .greeting {
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .user-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.7rem;
+      font-weight: 800;
+      margin-bottom: 24px;
+    }
+
+    /* Ring meter */
+    .ring-wrap {
+      position: relative;
+      width: 180px;
+      height: 180px;
+      margin: 0 auto 20px;
+    }
+
+    .ring-wrap svg {
+      width: 180px;
+      height: 180px;
+      transform: rotate(-90deg);
+    }
+
+    .ring-wrap circle {
+      fill: none;
+      stroke-width: 10;
+    }
+
+    .ring-track { stroke: rgba(255,255,255,0.06); }
+    .ring-fill {
+      stroke-dasharray: 452;
+      stroke-dashoffset: 452;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1) 0.4s,
+                  stroke 0.3s ease;
+    }
+
+    .ring-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .score-num {
+      font-family: 'Syne', sans-serif;
       font-size: 3.2rem;
+      font-weight: 800;
+      line-height: 1;
+      opacity: 0;
+      animation: fadeUp 0.5s 0.8s ease forwards;
     }
 
-    .desc {
-      font-size: 0.96rem;
-      padding: 16px;
+    .score-label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-top: 4px;
     }
 
-    .btn-pay {
-      font-size: 0.96rem;
-      padding: 16px;
-    }
-  }
-
-  @media (max-width: 480px) {
-    body {
-      padding: 10px 8px;
-    }
-
-    .card {
-      padding: 18px 14px;
-      border-radius: 16px;
+    .risk-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 18px;
+      border-radius: 100px;
+      font-weight: 700;
+      font-size: 0.88rem;
+      font-family: 'Syne', sans-serif;
+      letter-spacing: 0.04em;
+      opacity: 0;
+      animation: fadeUp 0.5s 1s ease forwards;
     }
 
-    h1 {
-      font-size: 1.35rem;
+    .risk-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
     }
 
-    .score {
-      font-size: 2.7rem;
+    /* RISK CARD */
+    .risk-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 22px 20px;
+      margin-bottom: 20px;
+      opacity: 0;
+      animation: fadeUp 0.6s 1.1s ease forwards;
     }
 
-    .desc {
-      font-size: 0.93rem;
-      line-height: 1.5;
-      padding: 14px;
-    }
-
-    .btn-pay {
-      font-size: 0.93rem;
-      padding: 15px 14px;
-    }
-
-    .muted {
+    .risk-card-title {
+      font-family: 'Syne', sans-serif;
       font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
     }
-  }
-</style>
+
+    .risk-card-text {
+      font-size: 0.92rem;
+      color: #cbd5e1;
+      line-height: 1.65;
+    }
+
+    /* WHAT'S INSIDE */
+    .inside-section {
+      margin-bottom: 24px;
+      opacity: 0;
+      animation: fadeUp 0.6s 1.2s ease forwards;
+    }
+
+    .section-title {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    .feature-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+    }
+
+    .feature-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+      background: rgba(37,99,235,0.15);
+    }
+
+    .feature-text {
+      flex: 1;
+    }
+
+    .feature-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 2px;
+    }
+
+    .feature-desc {
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    /* CTA */
+    .cta-section {
+      position: sticky;
+      bottom: 0;
+      background: linear-gradient(to top, var(--bg) 70%, transparent);
+      padding: 24px 0 8px;
+      opacity: 0;
+      animation: fadeUp 0.6s 1.3s ease forwards;
+    }
+
+    .cta-btn {
+      display: block;
+      width: 100%;
+      padding: 20px 24px;
+      background: var(--blue);
+      color: white;
+      text-decoration: none;
+      border-radius: 16px;
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      text-align: center;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.12), transparent);
+    }
+
+    .cta-btn:active { transform: scale(0.98); }
+
+    .cta-sub {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 10px;
+    }
+
+    .guarantee-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 8px;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* No data state */
+    #no-data {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .no-data-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.3rem;
+      margin-bottom: 12px;
+    }
+
+    .no-data-sub {
+      color: var(--muted);
+      margin-bottom: 24px;
+      font-size: 0.9rem;
+    }
+
+    .link-btn {
+      display: inline-block;
+      padding: 14px 28px;
+      background: var(--blue);
+      color: white;
+      text-decoration: none;
+      border-radius: 12px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+    }
+  </style>
 </head>
 <body>
-  <div id="main" class="card" style="display:none;">
-    <h1 style="margin-bottom:0;">Análise de <span id="userName"></span></h1>
-    <p style="color:#666;">Seu risco de substituição por IA em 2026 é:</p>
 
-    <div class="score"><span id="userScore"></span>%</div>
+  <div id="no-data" style="display:none;">
+    <div style="font-size:2.5rem; margin-bottom:16px;">🔒</div>
+    <div class="no-data-title">Resultado não encontrado</div>
+    <div class="no-data-sub">Complete o diagnóstico para ver seu resultado.</div>
+    <a href="index.html" class="link-btn">Fazer diagnóstico</a>
+  </div>
 
-    <div class="bar-wrap">
-      <div id="scoreBar" class="bar-fill"></div>
+  <div id="main">
+    <div class="top-bar">
+      <div class="logo">Perfil Lab</div>
+      <div class="result-badge">Diagnóstico 2026</div>
     </div>
 
-    <div class="desc" id="userDesc"></div>
+    <div class="score-section">
+      <div class="greeting">Resultado de</div>
+      <div class="user-name" id="userName"></div>
 
-    <a href="#" id="payLink" class="btn-pay" target="_self">
-      LIBERAR RELATÓRIO PERSONALIZADO
-    </a>
+      <div class="ring-wrap">
+        <svg viewBox="0 0 180 180">
+          <defs>
+            <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" id="gradStop1" style="stop-color:#2563eb"/>
+              <stop offset="100%" id="gradStop2" style="stop-color:#60a5fa"/>
+            </linearGradient>
+          </defs>
+          <circle class="ring-track" cx="90" cy="90" r="72"/>
+          <circle class="ring-fill" id="ringFill" cx="90" cy="90" r="72" stroke="url(#ringGrad)"/>
+        </svg>
+        <div class="ring-center">
+          <div class="score-num" id="scoreNum">0%</div>
+          <div class="score-label">de risco</div>
+        </div>
+      </div>
 
-    <p class="muted">✓ Resultado calculado com base nas respostas do seu diagnóstico.</p>
+      <div class="risk-label" id="riskLabel">
+        <div class="risk-dot" id="riskDot"></div>
+        <span id="riskText"></span>
+      </div>
+    </div>
+
+    <div class="risk-card">
+      <div class="risk-card-title">O que isso significa</div>
+      <div class="risk-card-text" id="riskDesc"></div>
+    </div>
+
+    <div class="inside-section">
+      <div class="section-title">O relatório completo inclui</div>
+      <div class="feature-list">
+        <div class="feature-item">
+          <div class="feature-icon">🎯</div>
+          <div class="feature-text">
+            <div class="feature-name">Vetores de risco detalhados</div>
+            <div class="feature-desc">Quais partes do seu trabalho serão automatizadas primeiro</div>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">🗺️</div>
+          <div class="feature-text">
+            <div class="feature-name">Plano de reposicionamento</div>
+            <div class="feature-desc">Passos práticos personalizados para seu perfil em 2026</div>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">⚡</div>
+          <div class="feature-text">
+            <div class="feature-name">Habilidades prioritárias</div>
+            <div class="feature-desc">As competências que aumentam seu valor frente à IA</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cta-section">
+      <a href="#" id="payLink" class="cta-btn">
+        Liberar meu relatório completo →
+      </a>
+      <div class="cta-sub">Resultado calculado com base nas suas respostas.</div>
+      <div class="guarantee-row">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Acesso imediato após confirmação
+      </div>
+    </div>
   </div>
-  
+
   <script>
     function montarLinkPagamento(baseUrl, data) {
-      const url = new URL(baseUrl);
-
-      url.searchParams.set("prefilled_email", data.email || "");
-      url.searchParams.set("client_reference_id", String(data.timestamp || ""));
-      url.searchParams.set("utm_source", "perfil_lab");
-      url.searchParams.set("utm_medium", "diagnostico");
-      url.searchParams.set("utm_campaign", data.product_type || "");
-
-      return url.toString();
+      try {
+        const url = new URL(baseUrl);
+        url.searchParams.set("prefilled_email", data.email || "");
+        url.searchParams.set("client_reference_id", String(data.timestamp || ""));
+        url.searchParams.set("utm_source", "perfil_lab");
+        url.searchParams.set("utm_medium", "diagnostico");
+        url.searchParams.set("utm_campaign", data.product_type || "");
+        return url.toString();
+      } catch(e) { return baseUrl; }
     }
 
     const d = JSON.parse(localStorage.getItem("perfilab_user") || "null");
 
     if (!d || !d.nome || d.score_percentual === undefined || d.score_percentual === null) {
-      window.location.href = "index.html";
+      document.getElementById('no-data').style.display = 'flex';
     } else {
-      document.getElementById("main").style.display = "block";
+      document.getElementById('main').style.display = 'block';
 
-      const nome = d.nome;
       const score = Number(d.score_percentual || 0);
+      document.getElementById('userName').textContent = d.nome.split(' ')[0];
 
-      document.getElementById("userName").innerText = nome;
-      document.getElementById("userScore").innerText = score;
-      document.getElementById("scoreBar").style.width = score + "%";
+      // Animate score number
+      let start = 0;
+      const duration = 1200;
+      const delay = 800;
+      setTimeout(() => {
+        const interval = setInterval(() => {
+          start = Math.min(start + Math.ceil(score / 50), score);
+          document.getElementById('scoreNum').textContent = start + '%';
+          if (start >= score) clearInterval(interval);
+        }, duration / 50);
+      }, delay);
 
-      const desc = document.getElementById("userDesc");
-      const link = document.getElementById("payLink");
+      // Ring animation
+      const circumference = 2 * Math.PI * 72; // 452.4
+      const offset = circumference * (1 - score / 100);
+      setTimeout(() => {
+        document.getElementById('ringFill').style.strokeDashoffset = offset;
+      }, 100);
 
+      // Risk config
+      let riskConfig;
       if (score >= 70) {
-        desc.innerHTML =
-          "<strong>CRÍTICO:</strong> Seu perfil está mais exposto a atividades repetitivas, operacionais ou passíveis de automação. O relatório detalhado mostrará os principais vetores de risco, caminhos de reposicionamento e prioridades de adaptação para 2026.";
+        riskConfig = {
+          label: 'Risco Crítico',
+          color: '#ef4444',
+          gradA: '#ef4444', gradB: '#f97316',
+          glow: 'rgba(239,68,68,0.14)',
+          bgLabel: 'rgba(239,68,68,0.12)',
+          desc: 'Seu perfil está fortemente exposto a atividades repetitivas, operacionais ou padronizadas — exatamente as que estão sendo automatizadas com mais velocidade. O relatório completo mostrará os vetores de risco específicos e o caminho mais rápido de reposicionamento para 2026.'
+        };
       } else if (score >= 40) {
-        desc.innerHTML =
-          "<strong>MODERADO:</strong> Seu perfil está em uma zona intermediária. Há espaço relevante para fortalecimento, aumento de produtividade e diferenciação profissional. O relatório detalhado mostrará onde você pode ganhar vantagem prática no curto prazo.";
+        riskConfig = {
+          label: 'Risco Moderado',
+          color: '#eab308',
+          gradA: '#eab308', gradB: '#f97316',
+          glow: 'rgba(234,179,8,0.12)',
+          bgLabel: 'rgba(234,179,8,0.12)',
+          desc: 'Seu perfil está em zona de atenção. Há vulnerabilidades reais, mas também janelas de oportunidade abertas. Com os movimentos certos em 2026, você pode passar de exposto para diferenciado. O relatório mostrará exatamente onde agir primeiro.'
+        };
       } else {
-        desc.innerHTML =
-          "<strong>ELITE:</strong> Seu perfil concentra competências mais humanas, analíticas ou estratégicas, menos vulneráveis à substituição direta. O relatório detalhado mostrará como ampliar esse posicionamento e capturar valor com IA, em vez de competir com ela.";
+        riskConfig = {
+          label: 'Perfil Elite',
+          color: '#22d3ee',
+          gradA: '#22d3ee', gradB: '#60a5fa',
+          glow: 'rgba(34,211,238,0.12)',
+          bgLabel: 'rgba(34,211,238,0.12)',
+          desc: 'Seu perfil concentra competências humanas, analíticas e estratégicas — as mais difíceis de automatizar. Mas manter essa vantagem exige movimento intencional. O relatório mostrará como ampliar esse posicionamento e capturar valor com IA, não competir com ela.'
+        };
       }
 
+      // Apply risk colors
+      document.documentElement.style.setProperty('--risk-glow', riskConfig.glow);
+      document.getElementById('gradStop1').style.stopColor = riskConfig.gradA;
+      document.getElementById('gradStop2').style.stopColor = riskConfig.gradB;
+
+      const labelEl = document.getElementById('riskLabel');
+      labelEl.style.background = riskConfig.bgLabel;
+      labelEl.style.color = riskConfig.color;
+      document.getElementById('riskDot').style.background = riskConfig.color;
+      document.getElementById('riskText').textContent = riskConfig.label;
+      document.getElementById('riskDesc').textContent = riskConfig.desc;
+
+      // Payment link
+      const link = document.getElementById('payLink');
       if (d.payment_link) {
         link.href = montarLinkPagamento(d.payment_link, d);
       } else {
         link.href = "#";
-        link.innerText = "LINK DE PAGAMENTO INDISPONÍVEL";
+        link.textContent = "Link temporariamente indisponível";
+        link.style.background = '#1e293b';
+        link.style.color = 'var(--muted)';
       }
     }
-
   </script>
 </body>
 </html>

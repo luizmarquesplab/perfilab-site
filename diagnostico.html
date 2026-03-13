@@ -4,426 +4,801 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Diagnóstico | Perfil Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    * {
-      box-sizing: border-box;
+    :root {
+      --blue: #2563eb;
+      --blue-light: #60a5fa;
+      --bg: #06060f;
+      --surface: #0e0e1c;
+      --surface2: #161628;
+      --border: rgba(255,255,255,0.09);
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --danger: #ef4444;
     }
 
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f7f6;
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    html, body {
+      height: 100%;
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 14px 20px 10px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-inner {
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    .header-top {
       display: flex;
-      justify-content: center;
       align-items: center;
-      min-height: 100vh;
-      margin: 0;
-      padding: 20px;
+      justify-content: space-between;
+      margin-bottom: 10px;
     }
 
-    #quiz-card {
-      background: white;
-      padding: 32px;
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-      max-width: 620px;
-      width: 100%;
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--blue-light);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
     }
 
-    .hidden {
-      display: none;
+    .step-counter {
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-weight: 500;
     }
 
-    input {
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      font-size: 16px;
-    }
-
-    button {
-      width: 100%;
-      padding: 14px;
-      margin-top: 10px;
-      background: #0078d4;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    button:disabled {
-      opacity: 0.7;
-      cursor: not-allowed;
-    }
-
-    .option {
-      background: white;
-      color: #222;
-      border: 2px solid #eaeaea;
-      text-align: left;
-      font-weight: normal;
-    }
-
-    .option:hover {
-      border-color: #0078d4;
-      background: #f3f8ff;
-    }
-
-    .progress {
-      background: #eee;
-      height: 8px;
-      border-radius: 4px;
-      margin-bottom: 20px;
+    /* Progress bar */
+    .progress-track {
+      height: 4px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 99px;
       overflow: hidden;
     }
 
-    #bar {
-      background: #0078d4;
+    .progress-fill {
       height: 100%;
+      background: linear-gradient(90deg, var(--blue), var(--blue-light));
+      border-radius: 99px;
       width: 0%;
-      transition: 0.3s;
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .error-box {
+    /* Step dots */
+    .step-dots {
+      display: flex;
+      gap: 4px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+
+    .dot {
+      height: 3px;
+      flex: 1;
+      background: rgba(255,255,255,0.1);
+      border-radius: 99px;
+      transition: background 0.3s ease;
+    }
+
+    .dot.done { background: var(--blue); }
+    .dot.current { background: var(--blue-light); }
+
+    /* ── MAIN CONTENT ── */
+    .main {
+      padding-top: 108px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── SCREENS ── */
+    .screen {
+      display: none;
+      flex: 1;
+      flex-direction: column;
+      padding: 24px 20px 40px;
+      max-width: 520px;
+      margin: 0 auto;
+      width: 100%;
+      animation: slideIn 0.35s cubic-bezier(0.4, 0, 0.2, 1) both;
+    }
+
+    .screen.active { display: flex; }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(30px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes slideInBack {
+      from { opacity: 0; transform: translateX(-30px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .screen.slide-back { animation-name: slideInBack; }
+
+    /* ── QUESTION SCREEN ── */
+    .q-category {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--blue-light);
+      margin-bottom: 14px;
+    }
+
+    .q-text {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(1.25rem, 5.5vw, 1.6rem);
+      font-weight: 700;
+      line-height: 1.25;
+      margin-bottom: 32px;
+      color: var(--text);
+    }
+
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .opt-btn {
+      width: 100%;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      padding: 18px 20px;
+      text-align: left;
+      cursor: pointer;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.97rem;
+      font-weight: 500;
+      line-height: 1.45;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: all 0.18s ease;
+      min-height: 72px;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .opt-letter {
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--muted);
+      flex-shrink: 0;
+      transition: all 0.18s ease;
+      font-family: 'Syne', sans-serif;
+    }
+
+    .opt-btn:active {
+      transform: scale(0.985);
+    }
+
+    .opt-btn.selected {
+      border-color: var(--blue);
+      background: rgba(37,99,235,0.12);
+    }
+
+    .opt-btn.selected .opt-letter {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: white;
+    }
+
+    .opt-btn.choosing {
+      animation: chooseFlash 0.3s ease;
+    }
+
+    @keyframes chooseFlash {
+      0% { transform: scale(1); }
+      50% { transform: scale(0.97); background: rgba(37,99,235,0.2); }
+      100% { transform: scale(1); }
+    }
+
+    /* Back button */
+    .back-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      cursor: pointer;
+      padding: 8px 0;
+      margin-top: 24px;
+      transition: color 0.2s;
+    }
+
+    .back-btn:hover { color: var(--text); }
+    .back-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    /* ── LEAD SCREEN (after quiz) ── */
+    .lead-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .lead-emoji {
+      font-size: 2.8rem;
+      margin-bottom: 12px;
+    }
+
+    .lead-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+      line-height: 1.2;
+    }
+
+    .lead-sub {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .teaser-score {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px 20px;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .teaser-blur {
+      font-family: 'Syne', sans-serif;
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: var(--blue-light);
+      filter: blur(10px);
+      user-select: none;
+    }
+
+    .teaser-text {
+      flex: 1;
+    }
+
+    .teaser-label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 4px;
+    }
+
+    .teaser-desc {
+      font-size: 0.87rem;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .form-fields {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .field-wrap {
+      position: relative;
+    }
+
+    .field-wrap input {
+      width: 100%;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+
+    .field-wrap input::placeholder {
+      color: rgba(148,163,184,0.5);
+    }
+
+    .field-wrap input:focus {
+      border-color: var(--blue);
+    }
+
+    .field-wrap input.error-field {
+      border-color: var(--danger);
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 18px 24px;
+      background: var(--blue);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.2s;
+      min-height: 58px;
+    }
+
+    .submit-btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+    }
+
+    .submit-btn:active { transform: scale(0.98); }
+    .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .privacy-note {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--muted);
       margin-top: 12px;
-      background: #fff4f4;
-      color: #b42318;
-      border: 1px solid #f1c0c0;
-      border-radius: 8px;
-      padding: 10px;
-      font-size: 14px;
-      white-space: pre-wrap;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
     }
 
-    .loading-wrap {
+    .error-msg {
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.3);
+      color: #fca5a5;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.83rem;
+      margin-top: 12px;
+      display: none;
+    }
+
+    .error-msg.show { display: block; }
+
+    /* ── LOADING SCREEN ── */
+    .loading-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      gap: 24px;
+      padding: 40px 20px;
       text-align: center;
     }
 
-    .spinner {
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #0078d4;
-      border-radius: 50%;
-      width: 42px;
-      height: 42px;
-      animation: spin 1s linear infinite;
-      margin: 20px auto;
+    .loading-ring {
+      position: relative;
+      width: 70px;
+      height: 70px;
     }
 
-    .small-muted {
-      color: #666;
-      font-size: 14px;
+    .loading-ring svg {
+      width: 70px;
+      height: 70px;
+      transform: rotate(-90deg);
     }
 
-    .quiz-actions {
+    .loading-ring circle {
+      fill: none;
+      stroke-width: 4;
+    }
+
+    .ring-track { stroke: rgba(255,255,255,0.07); }
+
+    .ring-fill {
+      stroke: url(#grad);
+      stroke-dasharray: 188;
+      stroke-dashoffset: 188;
+      stroke-linecap: round;
+      animation: fillRing 1.6s ease forwards;
+    }
+
+    @keyframes fillRing {
+      to { stroke-dashoffset: 47; }
+    }
+
+    .loading-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+
+    .loading-steps {
       display: flex;
+      flex-direction: column;
       gap: 10px;
-      margin-top: 14px;
+      text-align: left;
+      width: 100%;
+      max-width: 280px;
     }
 
-    .btn-secondary {
-      background: #eef3f8;
-      color: #234;
-      border: 1px solid #d7e2ec;
+    .loading-step {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.85rem;
+      color: var(--muted);
+      opacity: 0;
+      animation: stepAppear 0.4s ease forwards;
     }
 
-    .btn-secondary:hover {
-      background: #e5edf5;
+    .loading-step:nth-child(1) { animation-delay: 0.2s; }
+    .loading-step:nth-child(2) { animation-delay: 0.8s; }
+    .loading-step:nth-child(3) { animation-delay: 1.4s; }
+
+    .loading-step .step-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(37,99,235,0.2);
+      border: 1px solid var(--blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65rem;
+      color: var(--blue-light);
+      flex-shrink: 0;
     }
 
-    .quiz-meta {
-      color: #666;
-      font-size: 14px;
-      margin-bottom: 8px;
+    @keyframes stepAppear {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+    .send-error {
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.3);
+      color: #fca5a5;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 0.83rem;
+      margin-top: 16px;
+      display: none;
+      max-width: 360px;
+      text-align: left;
     }
 
-    @media (max-width: 640px) {
-      body {
-        padding: 14px;
-      }
+    .send-error.show { display: block; }
 
-      #quiz-card {
-        padding: 22px 16px;
-      }
-
-      .quiz-actions {
-        flex-direction: column;
-      }
+    .retry-btn {
+      margin-top: 12px;
+      padding: 10px 20px;
+      background: rgba(37,99,235,0.2);
+      border: 1px solid var(--blue);
+      color: var(--blue-light);
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: none;
     }
+
+    .retry-btn.show { display: inline-block; }
   </style>
 </head>
 <body>
-  <div id="quiz-card">
-    <div id="step-lead">
-      <h2>Inicie seu Diagnóstico</h2>
-      <p>
-        Responda às perguntas para calcular seu risco de substituição pela IA e receber um diagnóstico personalizado para 2026.
+
+  <!-- Fixed Header -->
+  <div class="header">
+    <div class="header-inner">
+      <div class="header-top">
+        <div class="logo">Perfil Lab</div>
+        <div class="step-counter" id="stepCounter"></div>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <div class="step-dots" id="stepDots"></div>
+    </div>
+  </div>
+
+  <!-- Main content area -->
+  <div class="main">
+
+    <!-- QUIZ SCREEN -->
+    <div class="screen active" id="screenQuiz">
+      <div class="q-category" id="qCategory">Diagnóstico IA · 2026</div>
+      <div class="q-text" id="qText"></div>
+      <div class="options-list" id="optionsList"></div>
+      <button class="back-btn" id="backBtn" disabled>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        Voltar
+      </button>
+    </div>
+
+    <!-- LEAD CAPTURE SCREEN (after quiz) -->
+    <div class="screen" id="screenLead">
+      <div class="lead-header">
+        <div class="lead-emoji">🎯</div>
+        <div class="lead-title">Diagnóstico concluído!</div>
+        <div class="lead-sub">Seu índice de risco foi calculado.<br>Insira seus dados para liberar o resultado.</div>
+      </div>
+
+      <div class="teaser-score">
+        <div class="teaser-blur" id="teaserScore">72%</div>
+        <div class="teaser-text">
+          <div class="teaser-label">Seu risco de substituição</div>
+          <div class="teaser-desc">Resultado bloqueado · Preencha abaixo para ver</div>
+        </div>
+      </div>
+
+      <div class="form-fields">
+        <div class="field-wrap">
+          <input type="text" id="inputName" placeholder="Seu nome completo" autocomplete="name" />
+        </div>
+        <div class="field-wrap">
+          <input type="email" id="inputEmail" placeholder="Seu melhor e-mail" autocomplete="email" inputmode="email" />
+        </div>
+        <div class="field-wrap">
+          <input type="tel" id="inputPhone" placeholder="WhatsApp com DDD" autocomplete="tel" inputmode="tel" />
+        </div>
+      </div>
+
+      <button class="submit-btn" id="submitBtn" type="button">
+        Ver meu resultado →
+      </button>
+
+      <p class="privacy-note">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Dados protegidos. Sem spam.
       </p>
 
-      <input type="text" id="name" placeholder="Seu nome completo" />
-      <input type="email" id="email" placeholder="Seu melhor e-mail" />
-      <input type="tel" id="phone" placeholder="WhatsApp com DDD" />
-
-      <button id="startBtn" type="button">Começar Diagnóstico →</button>
-      <div id="leadError" class="error-box hidden"></div>
+      <div class="error-msg" id="leadError"></div>
     </div>
 
-    <div id="step-quiz" class="hidden">
-      <div class="progress"><div id="bar"></div></div>
-      <div class="quiz-meta" id="quizMeta"></div>
-      <h3 id="q-text" style="min-height: 72px;"></h3>
-      <div id="options"></div>
+    <!-- LOADING SCREEN -->
+    <div class="screen" id="screenLoading">
+      <div class="loading-screen">
+        <div class="loading-ring">
+          <svg viewBox="0 0 70 70">
+            <defs>
+              <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:#2563eb"/>
+                <stop offset="100%" style="stop-color:#60a5fa"/>
+              </linearGradient>
+            </defs>
+            <circle class="ring-track" cx="35" cy="35" r="30"/>
+            <circle class="ring-fill" cx="35" cy="35" r="30"/>
+          </svg>
+        </div>
 
-      <div class="quiz-actions">
-        <button id="backBtn" type="button" class="btn-secondary">← Voltar</button>
+        <div class="loading-title">Analisando suas respostas…</div>
+
+        <div class="loading-steps">
+          <div class="loading-step">
+            <div class="step-icon">✓</div>
+            Calculando índice de risco
+          </div>
+          <div class="loading-step">
+            <div class="step-icon">✓</div>
+            Comparando com seu perfil
+          </div>
+          <div class="loading-step">
+            <div class="step-icon">✓</div>
+            Preparando diagnóstico
+          </div>
+        </div>
+
+        <div class="send-error" id="sendError"></div>
+        <button class="retry-btn" id="retryBtn" type="button">Tentar novamente</button>
       </div>
     </div>
 
-    <div id="step-loading" class="hidden">
-      <div class="loading-wrap">
-        <div class="spinner"></div>
-        <h3>Analisando suas respostas...</h3>
-        <p class="small-muted">Gravando seus dados e preparando seu score.</p>
-        <div id="sendError" class="error-box hidden"></div>
-      </div>
-    </div>
   </div>
 
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby8ha4RK3IWQRmgUdkpAYDDNGtvK_Ld8_Y7r7Y5GTd4qBF5Df2Cj_xLrixleu41oo48/exec";
     const SCORE_MAXIMO = 100;
 
-    let current = 0;
-    let leadData = null;
-    let answers = [];
-
     const questions = [
-      {
-        q: "1. Sua rotina envolve muitas tarefas repetitivas?",
-        opt: [
-          { t: "Sim, a maior parte do tempo.", p: 20 },
-          { t: "Não, meu trabalho é imprevisível.", p: 5 }
-        ]
-      },
-      {
-        q: "2. Você já utiliza ferramentas de IA no dia a dia?",
-        opt: [
-          { t: "Ainda não ou muito pouco.", p: 15 },
-          { t: "Sim, sou usuário frequente.", p: 0 }
-        ]
-      },
-      {
-        q: "3. Qual sua principal área de atuação?",
-        opt: [
-          { t: "Administrativa, Dados ou Técnica", p: 15 },
-          { t: "Saúde, Educação ou Criativa", p: 5 }
-        ]
-      },
-      {
-        q: "4. Seu trabalho exige negociações ou empatia humana complexa?",
-        opt: [
-          { t: "Raramente.", p: 15 },
-          { t: "O tempo todo.", p: 0 }
-        ]
-      },
-      {
-        q: "5. Sua empresa está planejando automações em 2026?",
-        opt: [
-          { t: "Sim, já ouvi falar.", p: 15 },
-          { t: "Não ou não sei.", p: 5 }
-        ]
-      },
-      {
-        q: "6. Quanto do seu dia é gasto em processos que seguem um padrão fixo?",
-        opt: [
-          { t: "Mais de 70% (Rotina fixa)", p: 25 },
-          { t: "Menos de 30% (Imprevisível)", p: 5 }
-        ]
-      },
-      {
-        q: "7. Na sua função, o que é mais decisivo: precisão técnica ou gestão de pessoas/conflitos?",
-        opt: [
-          { t: "Precisão técnica e dados", p: 20 },
-          { t: "Gestão de pessoas e conflitos", p: 5 }
-        ]
-      },
-      {
-        q: "8. Como você atualiza suas competências profissionais hoje?",
-        opt: [
-          { t: "Quase não atualizo ou faço isso de forma muito esporádica.", p: 20 },
-          { t: "Atualizo de forma constante e intencional.", p: 5 }
-        ]
-      },
-      {
-        q: "9. Se uma IA fizesse 50% do seu trabalho operacional hoje, o que você faria com o tempo livre?",
-        opt: [
-          { t: "Teria dificuldade para redefinir meu papel.", p: 20 },
-          { t: "Usaria o tempo para análise, melhoria e liderança.", p: 5 }
-        ]
-      },
-      {
-        q: "10. Qual o nível de complexidade das decisões que você toma sozinho?",
-        opt: [
-          { t: "Decisões operacionais e de baixa complexidade.", p: 20 },
-          { t: "Decisões complexas, com julgamento e impacto.", p: 5 }
-        ]
-      }
+      { q: "Sua rotina envolve muitas tarefas repetitivas?", cat: "Sobre o seu trabalho",
+        opt: [{ t: "Sim, a maior parte do tempo.", p: 20 }, { t: "Não, meu trabalho é imprevisível.", p: 5 }] },
+      { q: "Você já utiliza ferramentas de IA no seu dia a dia?", cat: "Adoção de tecnologia",
+        opt: [{ t: "Ainda não ou muito pouco.", p: 15 }, { t: "Sim, sou usuário frequente.", p: 0 }] },
+      { q: "Qual sua principal área de atuação?", cat: "Perfil profissional",
+        opt: [{ t: "Administrativa, Dados ou Técnica", p: 15 }, { t: "Saúde, Educação ou Criativa", p: 5 }] },
+      { q: "Seu trabalho exige negociações ou empatia humana complexa?", cat: "Habilidades humanas",
+        opt: [{ t: "Raramente ou nunca.", p: 15 }, { t: "O tempo todo — é central.", p: 0 }] },
+      { q: "Sua empresa está planejando automações em 2026?", cat: "Contexto da empresa",
+        opt: [{ t: "Sim, já ouvi falar.", p: 15 }, { t: "Não ou não sei.", p: 5 }] },
+      { q: "Quanto do seu dia é gasto em processos que seguem um padrão fixo?", cat: "Estrutura do trabalho",
+        opt: [{ t: "Mais de 70% — rotina bem definida.", p: 25 }, { t: "Menos de 30% — muito imprevisível.", p: 5 }] },
+      { q: "Na sua função, o que é mais decisivo?", cat: "Natureza das decisões",
+        opt: [{ t: "Precisão técnica e análise de dados", p: 20 }, { t: "Gestão de pessoas e conflitos", p: 5 }] },
+      { q: "Como você atualiza suas competências profissionais hoje?", cat: "Desenvolvimento contínuo",
+        opt: [{ t: "Quase não atualizo ou faço raramente.", p: 20 }, { t: "Atualizo de forma constante e intencional.", p: 5 }] },
+      { q: "Se uma IA fizesse 50% do seu trabalho operacional, o que você faria com o tempo?", cat: "Adaptabilidade",
+        opt: [{ t: "Teria dificuldade para redefinir meu papel.", p: 20 }, { t: "Usaria para análise, melhoria e liderança.", p: 5 }] },
+      { q: "Qual o nível de complexidade das decisões que você toma sozinho?", cat: "Complexidade decisória",
+        opt: [{ t: "Decisões operacionais e de baixa complexidade.", p: 20 }, { t: "Decisões complexas, com julgamento e impacto.", p: 5 }] }
     ];
 
-    function showLeadError(message) {
-      const box = document.getElementById("leadError");
-      box.textContent = message;
-      box.classList.remove("hidden");
+    let current = 0;
+    let answers = [];
+    let isGoingBack = false;
+    let pendingPayload = null;
+
+    // Build step dots
+    function buildDots() {
+      const container = document.getElementById('stepDots');
+      container.innerHTML = '';
+      questions.forEach((_, i) => {
+        const dot = document.createElement('div');
+        dot.className = 'dot';
+        dot.id = `dot-${i}`;
+        container.appendChild(dot);
+      });
     }
 
-    function hideLeadError() {
-      const box = document.getElementById("leadError");
-      box.textContent = "";
-      box.classList.add("hidden");
-    }
-
-    function showSendError(message) {
-      const box = document.getElementById("sendError");
-      box.textContent = message;
-      box.classList.remove("hidden");
-    }
-
-    function hideSendError() {
-      const box = document.getElementById("sendError");
-      box.textContent = "";
-      box.classList.add("hidden");
-    }
-
-    function validarEmail(email) {
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    }
-
-    function limparTelefone(telefone) {
-      return telefone.replace(/\D/g, "");
-    }
-
-    function calcularScoreBruto() {
-      return answers.reduce((total, answer) => total + (answer ? Number(answer.p || 0) : 0), 0);
-    }
-
-    function calcularScorePercentual(scoreBruto) {
-      return Math.round((scoreBruto / SCORE_MAXIMO) * 100);
-    }
-
-    function updateBackButton() {
-      const backBtn = document.getElementById("backBtn");
-      backBtn.disabled = current === 0;
+    function updateProgress() {
+      const pct = (current / questions.length) * 100;
+      document.getElementById('progressFill').style.width = pct + '%';
+      document.getElementById('stepCounter').textContent =
+        current < questions.length ? `${current + 1} de ${questions.length}` : '';
+      questions.forEach((_, i) => {
+        const dot = document.getElementById(`dot-${i}`);
+        if (!dot) return;
+        dot.className = 'dot' + (i < current ? ' done' : i === current ? ' current' : '');
+      });
     }
 
     function showQuestion() {
       const q = questions[current];
-      document.getElementById("q-text").innerText = q.q;
-      document.getElementById("quizMeta").innerText = `Pergunta ${current + 1} de ${questions.length}`;
+      const catEl = document.getElementById('qCategory');
+      const textEl = document.getElementById('qText');
+      const listEl = document.getElementById('optionsList');
+      const backBtn = document.getElementById('backBtn');
 
-      const optionsDiv = document.getElementById("options");
-      optionsDiv.innerHTML = "";
+      catEl.textContent = q.cat;
+      textEl.textContent = q.q;
+      listEl.innerHTML = '';
 
-      q.opt.forEach(function(option, index) {
-        const button = document.createElement("button");
-        button.type = "button";
-        button.className = "option";
-        button.textContent = option.t;
+      const letters = ['A', 'B'];
+      q.opt.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        if (answers[current] && answers[current].t === opt.t) btn.classList.add('selected');
 
-        if (answers[current] && answers[current].t === option.t && answers[current].p === option.p) {
-          button.style.borderColor = "#0078d4";
-          button.style.background = "#f3f8ff";
-        }
-
-        button.addEventListener("click", function() {
-          answers[current] = {
-            t: option.t,
-            p: option.p
-          };
-
-          current++;
-
-          if (current < questions.length) {
-            showQuestion();
-          } else {
-            finalizeQuiz();
-          }
-        });
-
-        optionsDiv.appendChild(button);
+        btn.innerHTML = `<span class="opt-letter">${letters[i]}</span><span>${opt.t}</span>`;
+        btn.addEventListener('click', () => handleAnswer(opt, btn));
+        listEl.appendChild(btn);
       });
 
-      document.getElementById("bar").style.width = (((current) / questions.length) * 100) + "%";
-      updateBackButton();
+      backBtn.disabled = current === 0;
+      updateProgress();
+
+      // Animate screen
+      const screen = document.getElementById('screenQuiz');
+      screen.classList.remove('slide-back');
+      if (isGoingBack) screen.classList.add('slide-back');
+      screen.style.animation = 'none';
+      requestAnimationFrame(() => {
+        screen.style.animation = '';
+      });
+      isGoingBack = false;
     }
 
-    function goBackQuestion() {
+    function handleAnswer(opt, btn) {
+      btn.classList.add('choosing');
+      setTimeout(() => {
+        answers[current] = { t: opt.t, p: opt.p };
+        current++;
+        if (current < questions.length) {
+          showQuestion();
+        } else {
+          showLeadScreen();
+        }
+      }, 220);
+    }
+
+    function goBack() {
       if (current === 0) return;
+      isGoingBack = true;
       current--;
       showQuestion();
     }
 
-    function startQuiz() {
-      hideLeadError();
+    function showLeadScreen() {
+      const scoreBruto = answers.reduce((s, a) => s + (a ? Number(a.p) : 0), 0);
+      const scorePct = Math.round((scoreBruto / SCORE_MAXIMO) * 100);
 
-      const name = document.getElementById("name").value.trim();
-      const email = document.getElementById("email").value.trim().toLowerCase();
-      const phone = limparTelefone(document.getElementById("phone").value.trim());
+      document.getElementById('teaserScore').textContent = scorePct + '%';
 
-      if (!name || !email || !phone) {
-        showLeadError("Preencha nome, e-mail e WhatsApp.");
-        return;
-      }
+      document.getElementById('stepCounter').textContent = 'Quase lá!';
+      document.getElementById('progressFill').style.width = '100%';
 
-      if (!validarEmail(email)) {
-        showLeadError("Digite um e-mail válido.");
-        return;
-      }
-
-      if (phone.length < 10) {
-        showLeadError("Digite um WhatsApp válido com DDD.");
-        return;
-      }
-
-      leadData = {
-        nome: name,
-        email: email,
-        whatsapp: phone
-      };
-
-      answers = [];
-      current = 0;
-
-      document.getElementById("step-lead").classList.add("hidden");
-      document.getElementById("step-quiz").classList.remove("hidden");
-
-      showQuestion();
+      switchScreen('screenQuiz', 'screenLead');
     }
 
-    async function finalizeQuiz() {
-      document.getElementById("step-quiz").classList.add("hidden");
-      document.getElementById("step-loading").classList.remove("hidden");
-      hideSendError();
+    function switchScreen(fromId, toId) {
+      document.getElementById(fromId).classList.remove('active');
+      const to = document.getElementById(toId);
+      to.classList.add('active');
+    }
 
-      const scoreBruto = calcularScoreBruto();
-      const scorePercentual = calcularScorePercentual(scoreBruto);
+    // Lead validation & submit
+    function validEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+    function cleanPhone(p) { return p.replace(/\D/g, ''); }
+
+    function showLeadError(msg) {
+      const el = document.getElementById('leadError');
+      el.textContent = msg;
+      el.classList.add('show');
+    }
+
+    function hideLeadError() {
+      document.getElementById('leadError').classList.remove('show');
+    }
+
+    async function submitLead() {
+      hideLeadError();
+      const name = document.getElementById('inputName').value.trim();
+      const email = document.getElementById('inputEmail').value.trim().toLowerCase();
+      const phone = cleanPhone(document.getElementById('inputPhone').value.trim());
+
+      // Validation
+      let err = '';
+      if (!name) err = 'Por favor, insira seu nome.';
+      else if (!email || !validEmail(email)) err = 'Insira um e-mail válido.';
+      else if (phone.length < 10) err = 'Insira um WhatsApp válido com DDD.';
+
+      if (err) { showLeadError(err); return; }
+
+      // Go to loading
+      switchScreen('screenLead', 'screenLoading');
+      document.getElementById('stepCounter').textContent = 'Finalizando…';
+
+      const scoreBruto = answers.reduce((s, a) => s + (a ? Number(a.p) : 0), 0);
+      const scorePercentual = Math.round((scoreBruto / SCORE_MAXIMO) * 100);
 
       const payload = {
         action: "lead_capture",
-        nome: leadData.nome,
-        email: leadData.email,
-        whatsapp: leadData.whatsapp,
+        nome: name,
+        email: email,
+        whatsapp: phone,
         score_bruto: scoreBruto,
         score_percentual: scorePercentual,
         timestamp: Date.now(),
-        origem: "diagnostico_html",
+        origem: "diagnostico_html_v2",
         respostas: answers.map((answer, index) => ({
           pergunta: questions[index].q,
           resposta: answer ? answer.t : "",
@@ -431,26 +806,28 @@
         }))
       };
 
+      pendingPayload = payload;
       localStorage.setItem("perfilab_user", JSON.stringify(payload));
+      await sendToServer(payload);
+    }
+
+    async function sendToServer(payload) {
+      const errorEl = document.getElementById('sendError');
+      const retryBtn = document.getElementById('retryBtn');
+      errorEl.classList.remove('show');
+      retryBtn.classList.remove('show');
 
       try {
         const response = await fetch(SCRIPT_URL, {
           method: "POST",
           body: JSON.stringify(payload)
         });
-
         const text = await response.text();
-
         let result;
-        try {
-          result = JSON.parse(text);
-        } catch (e) {
-          throw new Error("Resposta do Apps Script não é JSON válido.");
+        try { result = JSON.parse(text); } catch(e) {
+          throw new Error("Resposta inválida do servidor.");
         }
-
-        if (!result.ok) {
-          throw new Error(result.message || "Falha ao gravar lead.");
-        }
+        if (!result.ok) throw new Error(result.message || "Falha ao gravar dados.");
 
         const stored = JSON.parse(localStorage.getItem("perfilab_user") || "{}");
         stored.payment_link = result.payment_link || "";
@@ -458,15 +835,24 @@
         localStorage.setItem("perfilab_user", JSON.stringify(stored));
 
         window.location.href = "resultado.html";
-      } catch (error) {
-        console.error("Erro ao enviar lead:", error);
-        showSendError("Erro ao registrar os dados:\n" + error.message);
+      } catch(error) {
+        console.error(error);
+        errorEl.textContent = "Não foi possível registrar seus dados: " + error.message;
+        errorEl.classList.add('show');
+        retryBtn.classList.add('show');
       }
     }
 
-    document.addEventListener("DOMContentLoaded", function() {
-      document.getElementById("startBtn").addEventListener("click", startQuiz);
-      document.getElementById("backBtn").addEventListener("click", goBackQuestion);
+    // Init
+    document.addEventListener('DOMContentLoaded', () => {
+      buildDots();
+      showQuestion();
+
+      document.getElementById('backBtn').addEventListener('click', goBack);
+      document.getElementById('submitBtn').addEventListener('click', submitLead);
+      document.getElementById('retryBtn').addEventListener('click', () => {
+        if (pendingPayload) sendToServer(pendingPayload);
+      });
     });
   </script>
 </body>

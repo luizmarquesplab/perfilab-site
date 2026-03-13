@@ -1,27 +1,300 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sucesso | Perfil Lab</title>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #050505; color: white; text-align: center; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .card { max-width: 500px; padding: 40px; }
-        .check { font-size: 5rem; color: #2ecc71; margin-bottom: 20px; }
-        h1 { font-size: 2.5rem; margin-bottom: 10px; }
-        p { color: #aaa; line-height: 1.6; margin-bottom: 30px; }
-        .loader { border: 3px solid #333; border-top: 3px solid #0078d4; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 0 auto 20px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pagamento Confirmado | Perfil Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blue: #2563eb;
+      --blue-light: #60a5fa;
+      --bg: #06060f;
+      --surface: #0e0e1c;
+      --border: rgba(255,255,255,0.08);
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --green: #22d3ee;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 20px;
+      overflow: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(34,211,238,0.1) 0%, transparent 65%);
+      pointer-events: none;
+      animation: breathe 3s ease-in-out infinite;
+    }
+
+    @keyframes breathe {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.7; }
+      50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+    }
+
+    .card {
+      max-width: 440px;
+      width: 100%;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .check-wrap {
+      position: relative;
+      width: 88px;
+      height: 88px;
+      margin: 0 auto 28px;
+    }
+
+    .check-circle {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      background: rgba(34,211,238,0.12);
+      border: 2px solid rgba(34,211,238,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+
+    .check-circle svg {
+      stroke: var(--green);
+      animation: drawCheck 0.6s 0.4s ease forwards;
+      stroke-dasharray: 30;
+      stroke-dashoffset: 30;
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    @keyframes drawCheck {
+      to { stroke-dashoffset: 0; }
+    }
+
+    .pulse-ring {
+      position: absolute;
+      inset: -8px;
+      border-radius: 50%;
+      border: 2px solid rgba(34,211,238,0.2);
+      animation: pulseRing 2s 0.5s ease-out infinite;
+    }
+
+    @keyframes pulseRing {
+      0% { transform: scale(1); opacity: 0.6; }
+      100% { transform: scale(1.35); opacity: 0; }
+    }
+
+    .title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(1.6rem, 7vw, 2.1rem);
+      font-weight: 800;
+      margin-bottom: 10px;
+      opacity: 0;
+      animation: fadeUp 0.5s 0.3s ease forwards;
+    }
+
+    .title em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--green), var(--blue-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: var(--muted);
+      line-height: 1.65;
+      margin-bottom: 36px;
+      opacity: 0;
+      animation: fadeUp 0.5s 0.4s ease forwards;
+    }
+
+    /* Timeline */
+    .timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin-bottom: 36px;
+      opacity: 0;
+      animation: fadeUp 0.5s 0.5s ease forwards;
+    }
+
+    .timeline-item {
+      display: flex;
+      gap: 16px;
+      text-align: left;
+      position: relative;
+    }
+
+    .timeline-item:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 19px;
+      top: 40px;
+      width: 2px;
+      height: calc(100% - 20px);
+      background: var(--border);
+    }
+
+    .timeline-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 1rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+
+    .timeline-item.active .timeline-icon {
+      background: rgba(34,211,238,0.12);
+      border-color: rgba(34,211,238,0.3);
+      animation: iconPulse 2s infinite;
+    }
+
+    @keyframes iconPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(34,211,238,0.2); }
+      50% { box-shadow: 0 0 0 8px rgba(34,211,238,0); }
+    }
+
+    .timeline-body {
+      padding-top: 8px;
+    }
+
+    .timeline-title {
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 2px;
+    }
+
+    .timeline-desc {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .loader-bar {
+      width: 100%;
+      height: 3px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 99px;
+      overflow: hidden;
+      margin: 6px 0 0;
+    }
+
+    .loader-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--green), var(--blue-light));
+      border-radius: 99px;
+      animation: loadingBar 3s ease forwards;
+    }
+
+    @keyframes loadingBar {
+      0% { width: 0%; }
+      100% { width: 85%; }
+    }
+
+    /* Divider */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin-bottom: 28px;
+      opacity: 0;
+      animation: fadeUp 0.5s 0.6s ease forwards;
+    }
+
+    /* Support */
+    .support {
+      font-size: 0.8rem;
+      color: var(--muted);
+      opacity: 0;
+      animation: fadeUp 0.5s 0.7s ease forwards;
+    }
+
+    .support a {
+      color: var(--blue-light);
+      text-decoration: none;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
 <body>
-    <div class="card">
-        <div class="check">✓</div>
-        <h1>Pagamento Confirmado!</h1>
-        <div class="loader"></div>
-        <p>Nossa Inteligência Artificial está analisando suas respostas e redigindo seu relatório personalizado agora mesmo.</p>
-        <p><strong>Verifique seu e-mail em até 5 minutos.</strong> Não esqueça de checar a caixa de spam!</p>
-        <small style="color: #555;">Dúvidas? Suporte: seuemail@empresa.com</small>
+  <div class="card">
+    <div class="check-wrap">
+      <div class="check-circle">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+      <div class="pulse-ring"></div>
     </div>
+
+    <h1 class="title">Pagamento <em>confirmado!</em></h1>
+    <p class="subtitle">
+      Nossa IA está analisando suas respostas e redigindo<br>seu relatório personalizado agora mesmo.
+    </p>
+
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-icon">✓</div>
+        <div class="timeline-body">
+          <div class="timeline-title">Pagamento processado</div>
+          <div class="timeline-desc">Transação confirmada com sucesso.</div>
+        </div>
+      </div>
+      <div class="timeline-item active">
+        <div class="timeline-icon">⚙️</div>
+        <div class="timeline-body">
+          <div class="timeline-title">Gerando relatório com IA</div>
+          <div class="timeline-desc">Personalizando análise para o seu perfil…</div>
+          <div class="loader-bar"><div class="loader-fill"></div></div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-icon">📩</div>
+        <div class="timeline-body">
+          <div class="timeline-title">Entrega por e-mail</div>
+          <div class="timeline-desc">Chegará em até 5 minutos. Verifique o spam!</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <p class="support">
+      Dúvidas? Fale conosco:<br>
+      <a href="mailto:suporte@perfilab.com.br">suporte@perfilab.com.br</a>
+    </p>
+  </div>
 </body>
 </html>

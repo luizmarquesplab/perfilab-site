@@ -1,25 +1,339 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perfil Lab | O Futuro do Trabalho</title>
-    <style>
-        :root { --blue: #0078d4; --dark: #050505; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--dark); color: white; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; text-align: center; }
-        .container { max-width: 700px; padding: 20px; }
-        h1 { font-size: 3.5rem; background: linear-gradient(to right, #fff, var(--blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; }
-        p { font-size: 1.2rem; color: #aaa; margin-bottom: 30px; }
-        .btn { background: var(--blue); color: white; padding: 20px 40px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 1.2rem; transition: 0.3s; display: inline-block; }
-        .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0, 120, 212, 0.3); }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perfil Lab | Sua carreira sobrevive à IA?</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blue: #2563eb;
+      --blue-light: #60a5fa;
+      --bg: #06060f;
+      --surface: #0e0e1c;
+      --border: rgba(255,255,255,0.08);
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 20px 40px;
+      overflow-x: hidden;
+    }
+
+    /* Background glow */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(37,99,235,0.18) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .wrapper {
+      position: relative;
+      z-index: 1;
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(37,99,235,0.15);
+      border: 1px solid rgba(37,99,235,0.35);
+      color: var(--blue-light);
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 100px;
+      margin-bottom: 28px;
+      animation: fadeDown 0.6s ease both;
+    }
+
+    .badge::before {
+      content: '';
+      width: 7px;
+      height: 7px;
+      background: #22d3ee;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #22d3ee;
+      animation: pulse 2s infinite;
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.1rem, 9vw, 3.2rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+      animation: fadeDown 0.6s 0.1s ease both;
+    }
+
+    h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--blue-light), #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      font-size: 1.05rem;
+      color: var(--muted);
+      line-height: 1.65;
+      margin-bottom: 36px;
+      animation: fadeDown 0.6s 0.2s ease both;
+    }
+
+    .stats-row {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 36px;
+      animation: fadeDown 0.6s 0.3s ease both;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--blue-light);
+    }
+
+    .stat-label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-top: 2px;
+    }
+
+    .divider {
+      width: 1px;
+      background: var(--border);
+      align-self: stretch;
+    }
+
+    .cta-btn {
+      display: block;
+      width: 100%;
+      padding: 20px 24px;
+      background: var(--blue);
+      color: white;
+      text-decoration: none;
+      border-radius: 16px;
+      font-family: 'Syne', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      transition: all 0.25s ease;
+      position: relative;
+      overflow: hidden;
+      animation: fadeUp 0.6s 0.4s ease both;
+    }
+
+    .cta-btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.12), transparent);
+    }
+
+    .cta-btn:active {
+      transform: scale(0.98);
+    }
+
+    .cta-arrow {
+      display: inline-block;
+      margin-left: 8px;
+      transition: transform 0.2s;
+    }
+
+    .cta-btn:hover .cta-arrow {
+      transform: translateX(4px);
+    }
+
+    .trust-row {
+      margin-top: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      animation: fadeUp 0.6s 0.5s ease both;
+    }
+
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .trust-item svg {
+      color: #22d3ee;
+      flex-shrink: 0;
+    }
+
+    .cards-preview {
+      margin-top: 44px;
+      display: grid;
+      gap: 12px;
+      animation: fadeUp 0.6s 0.55s ease both;
+    }
+
+    .preview-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .preview-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+
+    .preview-card:nth-child(1) .preview-icon { background: rgba(239,68,68,0.15); }
+    .preview-card:nth-child(2) .preview-icon { background: rgba(234,179,8,0.15); }
+    .preview-card:nth-child(3) .preview-icon { background: rgba(34,197,94,0.15); }
+
+    .preview-title {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+
+    .preview-sub {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Sua carreira sobrevive à IA?</h1>
-        <p>Descubra seu índice de risco e receba um plano de ação personalizado gerado por Inteligência Artificial para 2026.</p>
-        <a href="diagnostico.html" class="btn">INICIAR DIAGNÓSTICO GRATUITO</a>
+  <div class="wrapper">
+    <div class="badge">Diagnóstico gratuito · 2 minutos</div>
+
+    <h1>Sua carreira<br>sobrevive<br>à <em>inteligência artificial?</em></h1>
+
+    <p class="subtitle">
+      Responda 10 perguntas e descubra seu risco de substituição.<br>
+      Diagnóstico personalizado para 2026.
+    </p>
+
+    <div class="stats-row">
+      <div class="stat">
+        <div class="stat-num">10</div>
+        <div class="stat-label">Perguntas</div>
+      </div>
+      <div class="divider"></div>
+      <div class="stat">
+        <div class="stat-num">2min</div>
+        <div class="stat-label">Duração</div>
+      </div>
+      <div class="divider"></div>
+      <div class="stat">
+        <div class="stat-num">100%</div>
+        <div class="stat-label">Gratuito</div>
+      </div>
     </div>
-    <script>localStorage.removeItem('perfilab_user');</script>
+
+    <a href="diagnostico.html" class="cta-btn">
+      Iniciar diagnóstico grátis <span class="cta-arrow">→</span>
+    </a>
+
+    <div class="trust-row">
+      <div class="trust-item">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Sem cartão
+      </div>
+      <div class="trust-item">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Resultado imediato
+      </div>
+      <div class="trust-item">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        100% privado
+      </div>
+    </div>
+
+    <div class="cards-preview">
+      <div class="preview-card">
+        <div class="preview-icon">🔴</div>
+        <div>
+          <div class="preview-title">Risco Crítico (70%+)</div>
+          <div class="preview-sub">Alta exposição à automação. Plano de ação urgente.</div>
+        </div>
+      </div>
+      <div class="preview-card">
+        <div class="preview-icon">🟡</div>
+        <div>
+          <div class="preview-title">Risco Moderado (40–69%)</div>
+          <div class="preview-sub">Zona de atenção. Janela de oportunidade aberta.</div>
+        </div>
+      </div>
+      <div class="preview-card">
+        <div class="preview-icon">🟢</div>
+        <div>
+          <div class="preview-title">Perfil Elite (abaixo de 40%)</div>
+          <div class="preview-sub">Competências difíceis de automatizar. Vantagem real.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>localStorage.removeItem('perfilab_user');</script>
 </body>
 </html>
