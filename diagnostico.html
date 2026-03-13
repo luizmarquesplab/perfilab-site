@@ -627,30 +627,53 @@
 
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby8ha4RK3IWQRmgUdkpAYDDNGtvK_Ld8_Y7r7Y5GTd4qBF5Df2Cj_xLrixleu41oo48/exec";
-    const SCORE_MAXIMO = 60;
+// =============================================
+// CONFIGURAÇÕES GLOBAIS E CONSTANTES
+// =============================================
+const SCORE_MAXIMO = 100;
+const MAX_PONTOS_BRUTOS = 185;     // soma das maiores opções de cada pergunta
+const MIN_PONTOS_BRUTOS = 40;      // soma das menores opções (opcional, mas útil)
 
-    const questions = [
-      { q: "Sua rotina envolve muitas tarefas repetitivas?", cat: "Sobre o seu trabalho",
-        opt: [{ t: "Sim, a maior parte do tempo.", p: 20 }, { t: "Não, meu trabalho é imprevisível.", p: 5 }] },
-      { q: "Você já utiliza ferramentas de IA no seu dia a dia?", cat: "Adoção de tecnologia",
-        opt: [{ t: "Ainda não ou muito pouco.", p: 15 }, { t: "Sim, sou usuário frequente.", p: 0 }] },
-      { q: "Qual sua principal área de atuação?", cat: "Perfil profissional",
-        opt: [{ t: "Administrativa, Dados ou Técnica", p: 15 }, { t: "Saúde, Educação ou Criativa", p: 5 }] },
-      { q: "Seu trabalho exige negociações ou empatia humana complexa?", cat: "Habilidades humanas",
-        opt: [{ t: "Raramente ou nunca.", p: 15 }, { t: "O tempo todo — é central.", p: 0 }] },
-      { q: "Sua empresa está planejando automações em 2026?", cat: "Contexto da empresa",
-        opt: [{ t: "Sim, já ouvi falar.", p: 15 }, { t: "Não ou não sei.", p: 5 }] },
-      { q: "Quanto do seu dia é gasto em processos que seguem um padrão fixo?", cat: "Estrutura do trabalho",
-        opt: [{ t: "Mais de 70% - Rotina bem definida.", p: 25 }, { t: "Menos de 30% — muito imprevisível.", p: 5 }] },
-      { q: "Na sua função, o que é mais decisivo?", cat: "Natureza das decisões",
-        opt: [{ t: "Perícia, precisão técnica e/ou análise de dados", p: 20 }, { t: "Gestão de pessoas e conflitos", p: 5 }] },
-      { q: "Como você atualiza suas competências profissionais hoje?", cat: "Desenvolvimento contínuo",
-        opt: [{ t: "Quase não atualizo ou faço raramente.", p: 20 }, { t: "Atualizo de forma constante e intencional.", p: 5 }] },
-      { q: "Se uma IA fizesse 50% do seu trabalho operacional, o que você faria com o tempo?", cat: "Adaptabilidade",
-        opt: [{ t: "Teria dificuldade para redefinir meu papel.", p: 20 }, { t: "Usaria para análise, melhoria e liderança.", p: 5 }] },
-      { q: "Qual o nível de complexidade das decisões que você toma sozinho?", cat: "Complexidade decisória",
-        opt: [{ t: "Decisões operacionais e de baixa complexidade.", p: 20 }, { t: "Decisões complexas, com julgamento e impacto.", p: 5 }] }
-    ];
+// =============================================
+// DADOS DO QUESTIONÁRIO
+// =============================================
+const questions = [
+  { q: "Sua rotina envolve muitas tarefas repetitivas?", cat: "Sobre o seu trabalho",
+    opt: [{ t: "Sim, a maior parte do tempo.", p: 20 }, { t: "Não, meu trabalho é imprevisível.", p: 5 }] },
+  // ... todas as outras perguntas aqui ...
+  { q: "Qual o nível de complexidade das decisões que você toma sozinho?", cat: "Complexidade decisória",
+    opt: [{ t: "Decisões operacionais e de baixa complexidade.", p: 20 }, { t: "Decisões complexas, com julgamento e impacto.", p: 5 }] }
+];
+
+// =============================================
+// FUNÇÕES DE CÁLCULO
+// =============================================
+function calcularPontosBrutos(answers) {
+  let pontos = 0;
+  answers.forEach((indiceOpcao, i) => {
+    pontos += questions[i].opt[indiceOpcao].p;
+  });
+  return pontos;
+}
+
+function calcularScore(answers) {
+  const pontos_brutos = calcularPontosBrutos(answers);
+  
+  // Normalização linear → 40 vira ~0%, 185 vira 100%
+  let score = (pontos_brutos - MIN_PONTOS_BRUTOS) / (MAX_PONTOS_BRUTOS - MIN_PONTOS_BRUTOS) * SCORE_MAXIMO;
+  
+  // Alternativa simples (sem subtrair o mínimo, mais comum):
+  // let score = (pontos_brutos / MAX_PONTOS_BRUTOS) * SCORE_MAXIMO;
+  
+  score = Math.round(score);
+  return Math.max(0, Math.min(SCORE_MAXIMO, score)); // clamp entre 0 e 100
+}
+
+// =============================================
+// Exemplo de uso (remova ou adapte no seu app)
+// =============================================
+// const respostasUsuario = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; // todas as opções "mais automatizáveis"
+// console.log("Score:", calcularScore(respostasUsuario)); // → ~100
 
     let current = 0;
     let answers = [];
