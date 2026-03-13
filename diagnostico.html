@@ -154,64 +154,85 @@
 
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby8ha4RK3IWQRmgUdkpAYDDNGtvK_Ld8_Y7r7Y5GTd4qBF5Df2Cj_xLrixleu41oo48/exec";
-    const SCORE_MAXIMO = 80;
+    const SCORE_MAXIMO = 100;
 
     let scoreTotal = 0;
     let current = 0;
     let leadData = null;
 
     const questions = [
-
-    {
-      q:"1. Quanto do seu trabalho segue processos previsíveis e repetitivos?",
-      opt:[
-      {t:"Mais de 80%",p:25},
-      {t:"Entre 50% e 80%",p:18},
-      {t:"Entre 20% e 50%",p:10},
-      {t:"Menos de 20%",p:5}
-      ]
-    },
-    
-    {
-      q:"2. O que define mais seu trabalho hoje?",
-      opt:[
-      {t:"Execução técnica e análise de dados",p:20},
-      {t:"Combinação de técnica e interação humana",p:15},
-      {t:"Coordenação de pessoas e decisões",p:8},
-      {t:"Estratégia e liderança",p:5}
-      ]
-    },
-    
-    {
-      q:"3. Como você atualiza suas competências profissionais?",
-      opt:[
-      {t:"Quase não atualizo",p:25},
-      {t:"Apenas quando necessário",p:18},
-      {t:"Cursos ocasionais",p:10},
-      {t:"Aprendizado contínuo estruturado",p:5}
-      ]
-    },
-    
-    {
-      q:"4. Se uma IA automatizasse metade do seu trabalho hoje, o que você faria?",
-      opt:[
-      {t:"Continuaria fazendo tarefas operacionais",p:22},
-      {t:"Ajudaria a supervisionar sistemas",p:15},
-      {t:"Trabalharia em análise e decisões",p:8},
-      {t:"Criaria novas soluções e estratégias",p:5}
-      ]
-    },
-    
-    {
-      q:"5. Qual o nível de complexidade das decisões que você toma?",
-      opt:[
-      {t:"Executo decisões definidas por outros",p:25},
-      {t:"Tomo decisões operacionais",p:18},
-      {t:"Tomo decisões táticas",p:10},
-      {t:"Tomo decisões estratégicas",p:5}
-      ]
-    }
-    
+  {
+    q: "1. Quanto do seu trabalho segue processos previsíveis e repetitivos?",
+    opt: [
+      { t: "Mais de 80%", p: 18 },
+      { t: "Entre 50% e 80%", p: 13 },
+      { t: "Entre 20% e 50%", p: 8 },
+      { t: "Menos de 20%", p: 3 }
+    ]
+  },
+  {
+    q: "2. Você já utiliza ferramentas de IA no dia a dia?",
+    opt: [
+      { t: "Ainda não ou quase nunca", p: 10 },
+      { t: "Uso ocasionalmente", p: 7 },
+      { t: "Uso com frequência", p: 3 },
+      { t: "A IA já faz parte da minha rotina", p: 0 }
+    ]
+  },
+  {
+    q: "3. Sua empresa está planejando automações em 2026?",
+    opt: [
+      { t: "Sim, claramente", p: 10 },
+      { t: "Há sinais de que sim", p: 7 },
+      { t: "Não sei dizer", p: 4 },
+      { t: "Não", p: 1 }
+    ]
+  },
+  {
+    q: "4. O que é mais decisivo na sua função hoje?",
+    opt: [
+      { t: "Execução técnica e precisão operacional", p: 14 },
+      { t: "Análise técnica com alguma interação humana", p: 10 },
+      { t: "Coordenação, influência e alinhamento", p: 5 },
+      { t: "Estratégia, liderança e decisão", p: 2 }
+    ]
+  },
+  {
+    q: "5. Como você atualiza suas competências profissionais hoje?",
+    opt: [
+      { t: "Quase não atualizo", p: 12 },
+      { t: "Só quando o mercado exige", p: 9 },
+      { t: "Faço cursos ocasionalmente", p: 5 },
+      { t: "Tenho rotina contínua de aprendizado", p: 1 }
+    ]
+  },
+  {
+    q: "6. Se uma IA fizesse 50% do seu trabalho operacional hoje, o que você faria com o tempo livre?",
+    opt: [
+      { t: "Continuaria focado em tarefas operacionais", p: 12 },
+      { t: "Ajudaria a revisar e supervisionar entregas", p: 8 },
+      { t: "Investiria mais em análise e tomada de decisão", p: 4 },
+      { t: "Criaria novas soluções, projetos ou estratégias", p: 1 }
+    ]
+  },
+  {
+    q: "7. Qual o nível de complexidade das decisões que você toma sozinho?",
+    opt: [
+      { t: "Executo decisões definidas por outros", p: 14 },
+      { t: "Tomo decisões operacionais do dia a dia", p: 10 },
+      { t: "Tomo decisões táticas com impacto relevante", p: 5 },
+      { t: "Tomo decisões estratégicas", p: 1 }
+    ]
+  },
+  {
+    q: "8. Seu trabalho exige negociações, julgamento crítico ou empatia humana complexa?",
+    opt: [
+      { t: "Raramente", p: 10 },
+      { t: "Às vezes", p: 7 },
+      { t: "Com frequência", p: 3 },
+      { t: "O tempo todo", p: 0 }
+    ]
+  } 
     ];
 
     function showLeadError(message) {
@@ -246,9 +267,9 @@
       return telefone.replace(/\D/g, "");
     }
 
-    function calcularScorePercentual(scoreBruto) {
-      return Math.round((scoreBruto / SCORE_MAXIMO) * 100);
-    }
+   function calcularScorePercentual(scoreBruto) {
+        return scoreBruto;
+      }
 
     function showQuestion() {
       const q = questions[current];
